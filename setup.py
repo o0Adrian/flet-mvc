@@ -4,7 +4,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 DESCRIPTION = 'This package will allow the developer to use an mvc structure in a Flet project.'
 
 # Setting up
@@ -21,7 +21,7 @@ setup(
     install_requires=['flet'],
     keywords=['mvc', 'flet', 'flet mvc', 'model', 'view', 'controller', 'node', 'datapoint'],
     classifiers=[
-        "Development Status :: 1 - Beta",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
         "Operating System :: Unix",
