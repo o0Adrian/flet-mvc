@@ -4,7 +4,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 DESCRIPTION = 'This package will allow the developer to use an mvc structure in a Flet project.'
 
 # Setting up
