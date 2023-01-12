@@ -29,7 +29,7 @@ The MVC pattern helps in separation of concern, **maintainability** and testabil
 
 In even simple terms:
 
-- The Model updates de view when it’s values are changed by the controller
+- The Model can update the view when it’s values are changed by the controller. or just a "container" of data used in the app.
 
 - The View is what you see and can interact with
 
