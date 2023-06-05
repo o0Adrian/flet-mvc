@@ -1,6 +1,6 @@
 # **FLET MVC Architecture**
 
-# Table of Contents
+# Content
 * [What is MVC?](#whatismvc)
 * [Flet and MVC](#fletandmvc)
 * [The flet-mvc package](#package)
@@ -29,7 +29,7 @@ The MVC pattern helps in separation of concern, **maintainability** and testabil
 
 In even simple terms:
 
-- The Model updates de view when it’s values are changed by the controller
+- The Model can update the view when it’s values are changed by the controller. or just a "container" of data used in the app.
 
 - The View is what you see and can interact with
 
@@ -82,11 +82,11 @@ This will keep the app maintenance and scalability on point.
 
 **One more example**
 
-Image an flet web app that looks like this:
+Imagine a flet app that looks like this:
 
 ![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.003.png)
 
-This web app example has an index view, this index view contains a layer and a navigation menu that will allow the user to change the view to three different tabs: Home, Statistics and Dashboard. Each view containing unique logic.
+This app example has an index view, this index view contains a layer and a navigation menu that will allow the user to change the view to three different tabs: Home, Statistics and Dashboard. Each view containing unique logic.
 
 How do we keep organized the code of this app? Using a similar MVC codebase structure. Something like this:
 
