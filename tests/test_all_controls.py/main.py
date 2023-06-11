@@ -1,29 +1,33 @@
-from controller import TaskController
-from view import TaskView
-from model import TaskModel
+from controller import TestController
+from view import TestView
+from model import TestModel
 
 import flet as ft
 
 def main(page):
     # MVC set-up
-    model = TaskModel()
-    controller = TaskController(page, model)
-    view = TaskView(controller, model)
-    
-    # model operations
-    model.controller = controller
-    # model.create_tasks()
+    model = TestModel()
+    controller = TestController(page, model)
+    model.controller = controller  # important to set controller in model (in needed) before view
+    view = TestView(controller, model)
     
     # Settings
-    page.appbar = view.app_bar  # NOTE: adding in setting, but remember controller has access to page too.
+    
+    # NOTE: adding in setting, but remember controller has access to page too; so
+    # you can set this values in a function of the controller, which I recommned to do.
+    page.appbar = view.app_bar
     page.overlay.append(view.audio)
+    page.overlay.append(view.bottom_sheet)
+    page.overlay.append(view.file_picker)
     page.banner = view.banner
+    page.snack_bar = view.snack_bar
+    page.floating_action_button = view.fab
     
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.on_keyboard_event = controller.on_keyboard
     page.theme_mode = "light"
     page.padding = 20
-    page.window_width = 580
+    page.window_width = 600
     page.window_always_on_top = True
     page.window_resizable = False
     page.window_height = 500

@@ -2,7 +2,7 @@
 Data decorator. Originally created to be used in every method of the model class
 it will convert the method to a datapoint/node that can be set and reset.
 
-It will allows using a reference datapoints automatically when sent in
+It allows using a reference datapoints automatically when sent in
 the "ref" parameter of a Flet Control.
 
 Next Feature: Dependency between datapoints (currently we can't set default values
@@ -14,7 +14,6 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Optional, Callable, List
 
-
 logging.basicConfig(level=logging.WARNING)
 
 __all__ = ["data", "FletModel"]
@@ -23,6 +22,7 @@ __all__ = ["data", "FletModel"]
 class FletModel:
     def __init__(self, **kwargs):
         self.ref_objs = []
+        self.controller = None
 
 
 class _Null:
@@ -54,7 +54,7 @@ class data:
     def __init__(self, f: Callable[..., Any]):
         self.is_instanciated = False
         self.func = f
-        self.datapoint_name: str = f.__name__
+        self.name: str = f.__name__
         self.__has_changed = False
         self.__value: Optional[Any] = NULL
         self.__new_default: Optional[Any] = NULL
@@ -80,7 +80,7 @@ class data:
         # ref_only
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint is not callable; perhaps you meant 'self.model.{self.datapoint_name}.current' to access Referenced object."
+                f"'Ref Only' datapoint is not callable; perhaps you meant 'self.model.{self.name}.current' to access Referenced object."
             )
 
         if self.is_ref_obj:
@@ -111,7 +111,7 @@ class data:
         if self.__ref_only:
             if self.func(instance) != None:
                 logging.warning(
-                    f"The datapoint '{self.datapoint_name}' is Ref Only, the returned value '{self.func(instance)}' won't have any impact. Consider returning 'None' value."
+                    f"The datapoint '{self.name}' is Ref Only, the returned value '{self.func(instance)}' won't have any impact. Consider returning 'None' value."
                 )
             return self
 
@@ -119,7 +119,7 @@ class data:
             self.value = self.func(instance)
 
         return self
-    
+
     def has_changed(self):
         return self.__has_changed
 
@@ -127,7 +127,7 @@ class data:
     def value(self):
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint doesn't have a 'value' functionality; perhaps you meant 'self.model.{self.datapoint_name}.current.<desired method/attribute>' to retrieve a value"
+                f"'Ref Only' datapoint doesn't have a 'value' functionality; perhaps you meant 'self.model.{self.name}.current.<desired method/attribute>' to retrieve a value"
             )
         return self.__value
 
@@ -138,7 +138,7 @@ class data:
         # triggered by set_value
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint doesn't have a 'value' property, to set a value use 'self.model.{self.datapoint_name}.current.<desired method/attribute> = {value}'"
+                f"'Ref Only' datapoint doesn't have a 'value' property, to set a value use 'self.model.{self.name}.current.<desired method/attribute> = {value}'"
             )
 
         self.__value = value
@@ -148,9 +148,13 @@ class data:
                 if ref_obj.ref_type is None or isinstance(value, ref_obj.ref_type):
                     setattr(ref_obj.current, ref_obj.ref_attr, value)
                 else:
-                    help_str = "" if value else " Perhaps you meant to use the @data.RefOnly decorator."
+                    help_str = (
+                        ""
+                        if value
+                        else " Perhaps you meant to use the @data.RefOnly decorator."
+                    )
                     raise TypeError(
-                        f"The {type(value)} value of the Datapoint '{self.datapoint_name}' does not match expected type '{ref_obj.ref_type}' for '{ref_obj.current}'.{help_str}"
+                        f"The {type(value)} value of the Datapoint '{self.name}' does not match expected type '{ref_obj.ref_type}' for '{ref_obj.current}'.{help_str}"
                     )
 
     @property
@@ -171,27 +175,37 @@ class data:
     def current(self, current):
         """First triggered when adding to ref property of a control, this is how we will set the datapoint as a ref obj"""
         if self.__ref_only:
-            # if is ref_only and being assigned to another control 
+            # if is ref_only and being assigned to another control
             if len(self.__ref_datapoints) == 1:
                 raise ValueError(
-                    f"The datapoint '{self.datapoint_name}' is a (Single) Ref object only and has already been asigned to {self.__ref_datapoints[0].current.__class__}, cannot be linked to multiple Controls"
+                    f"The datapoint '{self.name}' is a (Single) Ref object only and has already been asigned to {self.__ref_datapoints[0].current.__class__}, cannot be linked to multiple Controls"
                 )
             self.__ref_datapoints.append(RefDatapoint(current=current))
             self.is_ref_obj = True
             return
 
         ref_datapoint = RefDatapoint(current=current)
-        potential_attributes = {  # order matters, controls may have more than one atribute.
+        potential_attributes = { 
+            # order matters, controls may have more than one atribute.
+            # DO NOT TOUCH ORDER, they were carefully selected.
+            "options": list,
             "value": None,  # accept any value
             "label": str,
             "src": str,
             "text": str,
             "name": str,
             "items": list,
-            "content": None,  # Either List or Flet Control.
+            "shapes": list,
+            "content": None,  # Either List or Flet Control. | Why? don't know, inconsistency on Flet's attrs
             "actions": list,
             "controls": list,
             "figure": None,  # accept any value
+            "title": None,  # accept any value
+            "rows": list,
+            "cells": list,
+            "destinations": list,
+            "tabs": list,
+            "paint": None,
         }
         for attr, attr_type in potential_attributes.items():
             if hasattr(current.__class__, attr):
@@ -222,7 +236,7 @@ class data:
         # set data value, calling value setter
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint is not settable; perhaps you meant to change a value using 'self.model.{self.datapoint_name}.current.<desired method/attribute> = {x}' to modify the Referenced object."
+                f"'Ref Only' datapoint is not settable; perhaps you meant to change a value using 'self.model.{self.name}.current.<desired method/attribute> = {x}' to modify the Referenced object."
             )
         self.__has_changed = True
         self.value = x
@@ -260,7 +274,7 @@ class data:
     def append(self, newitem: Any) -> None:
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint doesn't have 'append' functionality; perhaps you meant 'self.model.{self.datapoint_name}.current.<desired method>.append({x})' to append a new object."
+                f"'Ref Only' datapoint doesn't have 'append' functionality; perhaps you meant 'self.model.{self.name}.current.<desired method>.append({x})' to append a new object."
             )
         if self.is_container_ref:
             # Using first element since they share the same list reference.
@@ -269,7 +283,7 @@ class data:
             ).append(newitem)
         else:
             raise TypeError(
-                f"Append failed. Datapoint '{self.datapoint_name}' is not a ref obj. Maybe you meant 'self.model.{self.datapoint_name}().append({newitem})'"
+                f"Append failed. Datapoint '{self.name}' is not a ref obj. Maybe you meant 'self.model.{self.name}().append({newitem})'"
             )
 
     def __set__(self, instance, value):
@@ -280,7 +294,7 @@ class data:
         return True
 
     def __repr__(self) -> str:
-        return f"<Datapoint: name={self.datapoint_name} value={self.value}>"
+        return f"<Datapoint: name={self.name} value={self.value}>"
 
     # Not sure the operators should be valid... TODO: Think on valid operators for datapoint object:
     # def __lt__(self, other):
