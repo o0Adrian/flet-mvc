@@ -2,7 +2,6 @@ import pytest
 import flet as ft
 import os
 import sys
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flet_mvc import FletModel, data
 from data.component_attribute import component_value_attr_map, potential_attributes
@@ -71,25 +70,25 @@ def test_datapoint_logical():
 # Test DataPoint logical operations
 def test_datapoint_ref_only():
     model = MockModel()
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint()
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.set_value()
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.append(1)
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.value
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.value = 1
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.set_new_default()
-    
+
     with pytest.raises(TypeError):
         model.ref_only_datapoint.reset()
 

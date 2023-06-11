@@ -90,7 +90,7 @@ class data:
             )
         else:
             return self.value
-        
+
     def __hard_reset__(self) -> None:
         """Used on testing only so far"""
         self.is_instanciated = False
@@ -102,7 +102,6 @@ class data:
         self.is_container_ref: bool = False
         self.is_ref_multi_referenced: bool = False
         self.__get__(self.model_instance, None)
-        
 
     def __get__(self, instance, owner):
         """
@@ -181,7 +180,9 @@ class data:
         return (
             [ref_obj.current for ref_obj in self.__ref_datapoints]
             if self.is_ref_multi_referenced
-            else self.__ref_datapoints[0].current if self.__ref_datapoints else None
+            else self.__ref_datapoints[0].current
+            if self.__ref_datapoints
+            else None
         )
 
     @current.setter
@@ -198,7 +199,7 @@ class data:
             return
 
         ref_datapoint = RefDatapoint(current=current)
-        potential_attributes = { 
+        potential_attributes = {
             # order matters, controls may have more than one atribute.
             # DO NOT TOUCH ORDER, they were carefully selected.
             "options": list,
@@ -296,7 +297,9 @@ class data:
             ).append(newitem)
             self.__has_set_value = False
         elif type(self.__value) != list:
-            raise AttributeError(f"'{type(self.__value)}' object has no attribute 'append'")
+            raise AttributeError(
+                f"'{type(self.__value)}' object has no attribute 'append'"
+            )
         else:
             raise TypeError(
                 f"Append failed. Datapoint '{self.name}' is not a ref obj. Maybe you meant 'self.model.{self.name}().append({newitem})'"
@@ -312,48 +315,5 @@ class data:
     def __repr__(self) -> str:
         return f"<Datapoint: name={self.name} value={self.value}>"
 
-    # Not sure the operators should be valid... TODO: Think on valid operators for datapoint object:
-    # def __lt__(self, other):
-    #     return self.value < other
-
-    # def __le__(self, other):
-    #     return self.value <= other
-
-    # def __eq__(self, other):
-    #     return self.value == other
-
-    # def __ne__(self, other):
-    #     return self.value != other
-
-    # def __gt__(self, other):
-    #     return self.value > other
-
-    # def __ge__(self, other):
-    #     return self.value >= other
-
     def __len__(self):
         return len(self.value)
-
-    # def __add__(self, other):
-    #     return self.value + other
-
-    # def __sub__(self, other):
-    #     return self.value - other
-
-    # def __div__(self, other):
-    #     return self.value/other
-
-    # def __mul__(self, other):
-    #     return self.value * other
-
-    # def __neg__(self):
-    #     return -self.value
-
-    # def __pos__(self):
-    #     return +self.value
-
-    # def __abs__(self):
-    #     return abs(self.value)
-
-    # def __invert__(self):
-    #     return ~self.value
