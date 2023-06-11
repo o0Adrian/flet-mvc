@@ -14,7 +14,7 @@ def main(page):
     # Settings
     
     # NOTE: adding in setting, but remember controller has access to page too; so
-    # you can set this values in a function of the controller, which I recommned to do.
+    # you can set this values in a function of the controller, which I recommend to do.
     page.appbar = view.app_bar
     page.overlay.append(view.audio)
     page.overlay.append(view.bottom_sheet)

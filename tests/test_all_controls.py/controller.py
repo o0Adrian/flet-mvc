@@ -21,7 +21,7 @@ class TestController(FletController):
 
     def animate(self, e):
         """2. Animated Switcher"""
-        if self.model.AnimatedSwitcher.has_changed():
+        if self.model.AnimatedSwitcher.has_set_value():
             self.model.AnimatedSwitcher.reset()
         else:
             self.model.AnimatedSwitcher.set_value(

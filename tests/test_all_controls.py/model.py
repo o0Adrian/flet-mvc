@@ -496,7 +496,7 @@ class MyApp extends StatelessWidget {
 
     @data
     def Canvas(self):
-        """62. Canvas | Attribute: MISSING"""
+        """62. Canvas | Attribute: shapes"""
         return [
             ft.canvas.Circle(100, 100, 50, self.PaintStroke()),
             ft.canvas.Circle(80, 90, 10, self.PaintStroke()),

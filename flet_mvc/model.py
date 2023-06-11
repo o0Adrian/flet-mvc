@@ -55,7 +55,7 @@ class data:
         self.is_instanciated = False
         self.func = f
         self.name: str = f.__name__
-        self.__has_changed = False
+        self.__has_set_value = False
         self.__value: Optional[Any] = NULL
         self.__new_default: Optional[Any] = NULL
         self.__ref_only = False
@@ -90,6 +90,19 @@ class data:
             )
         else:
             return self.value
+        
+    def __hard_reset__(self) -> None:
+        """Used on testing only so far"""
+        self.is_instanciated = False
+        self.__has_set_value = False
+        self.__value: Optional[Any] = NULL
+        self.__new_default: Optional[Any] = NULL
+        self.__ref_datapoints: List[RefDatapoint] = []
+        self.is_ref_obj: bool = False
+        self.is_container_ref: bool = False
+        self.is_ref_multi_referenced: bool = False
+        self.__get__(self.model_instance, None)
+        
 
     def __get__(self, instance, owner):
         """
@@ -120,8 +133,8 @@ class data:
 
         return self
 
-    def has_changed(self):
-        return self.__has_changed
+    def has_set_value(self):
+        return self.__has_set_value
 
     @property
     def value(self):
@@ -168,7 +181,7 @@ class data:
         return (
             [ref_obj.current for ref_obj in self.__ref_datapoints]
             if self.is_ref_multi_referenced
-            else self.__ref_datapoints[0].current
+            else self.__ref_datapoints[0].current if self.__ref_datapoints else None
         )
 
     @current.setter
@@ -238,7 +251,7 @@ class data:
             raise TypeError(
                 f"'Ref Only' datapoint is not settable; perhaps you meant to change a value using 'self.model.{self.name}.current.<desired method/attribute> = {x}' to modify the Referenced object."
             )
-        self.__has_changed = True
+        self.__has_set_value = True
         self.value = x
 
     def reset(self) -> None:
@@ -259,7 +272,7 @@ class data:
             if self.__new_default is NULL
             else self.__new_default
         )
-        self.__has_changed = False
+        self.__has_set_value = False
 
     def set_new_default(self, x: Any) -> None:
         """
@@ -274,13 +287,16 @@ class data:
     def append(self, newitem: Any) -> None:
         if self.__ref_only:
             raise TypeError(
-                f"'Ref Only' datapoint doesn't have 'append' functionality; perhaps you meant 'self.model.{self.name}.current.<desired method>.append({x})' to append a new object."
+                f"'Ref Only' datapoint doesn't have 'append' functionality; perhaps you meant 'self.model.{self.name}.current.<desired method>.append({newitem})' to append a new object."
             )
         if self.is_container_ref:
             # Using first element since they share the same list reference.
             getattr(
                 self.__ref_datapoints[0].current, self.__ref_datapoints[0].ref_attr
             ).append(newitem)
+            self.__has_set_value = False
+        elif type(self.__value) != list:
+            raise AttributeError(f"'{type(self.__value)}' object has no attribute 'append'")
         else:
             raise TypeError(
                 f"Append failed. Datapoint '{self.name}' is not a ref obj. Maybe you meant 'self.model.{self.name}().append({newitem})'"
