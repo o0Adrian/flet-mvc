@@ -87,7 +87,7 @@ def test_datapoint_ref_only():
         model.ref_only_datapoint.value = 1
 
     with pytest.raises(TypeError):
-        model.ref_only_datapoint.set_new_default()
+        model.ref_only_datapoint.set_default()
 
     with pytest.raises(TypeError):
         model.ref_only_datapoint.reset()
@@ -115,7 +115,7 @@ def test_initial_value(component, value_attr):
         value = ft.Text("test")  # Default case
         new_default = ft.Text("new_default")
 
-    model.ref_datapoint.set_new_default(new_default)
+    model.ref_datapoint.set_default(new_default)
     kwargs = {value_attr: value}
 
     component_instance = component(ref=model.ref_datapoint, **kwargs)

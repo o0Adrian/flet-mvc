@@ -25,7 +25,7 @@ class TestModel(FletModel):
     @data
     def Dialog(self):
         """1. Dialog datapoint | Attribute: content"""
-        return []
+        return ft.Text("test")
 
     @data
     def AnimatedSwitcher(self):

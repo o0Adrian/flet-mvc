@@ -275,7 +275,7 @@ class data:
         )
         self.__has_set_value = False
 
-    def set_new_default(self, x: Any) -> None:
+    def set_default(self, x: Any) -> None:
         """
         WARNING: once you set a new default, every time you hit reset,
         it will always return this new value. Haven't thought of a use

@@ -1,6 +1,24 @@
-# **FLET MVC Architecture**
+<h1 align="center">
+  <br>
+  [LOGO IN PROGRESS]
+  <br>
+  <br>
+  <strong>Flet-MVC</strong>
+  <br>
+</h1>
+
+<h4 align="center">The coding best practices for <a href="https://flet.dev/" target="_blank">Flet</a>.</h4>
+
+<p align="center">
+    <img src=https://img.shields.io/pypi/pyversions/flet-mvc>
+    <img src=https://img.shields.io/pypi/dm/flet-mvc>
+    <img src=https://badge.fury.io/py/flet-mvc.svg>
+</p>
+<br>
 
 # Content
+* [What's next?](#next-updates)
+* [Before we start](#before)
 * [What is MVC?](#whatismvc)
 * [Flet and MVC](#fletandmvc)
 * [The flet-mvc package](#package)
@@ -10,9 +28,64 @@
         * [Basic structure](#structure)
         * [Explanation of the basic structure](#explanation)
         * [Controller Extra abilities](#extra)
+    * [Datapoints](#datapoints)
+        * [Supported Controls](#controls)
+* [Common Mistakes](#common-mistakes)
 
 
 
+# Version History
+### **Flet-mvc v0.1.0 - The datapoint update:**
+
+- Added Ref Datapoints:<br>Creating Ref objects is no longer a pain, the need of using `__init__` and attributes in the model has been removed. It's now as easy as creating a new datapoint and setting it up inside a flet control: `ft.Text(ref=model.MyRefDatapoint)`.<br>They will show the returned value to the flet Control automatically and change it's value whenever a value is set to this datapoints. For more information see  [Datapoints](#datapoints).
+- Added RefOnly Datapoints: <br> This datapoins can be using by declaring the following decorator: `@data.RefOnly`, the difference between the normal Ref datapoints is that this won't set any value to it's control by default, instead you will use it as any normal flet ref obj by calling `.current` and any needed attribute.
+- Added `.has_set_value()` method to the datapoint object, which returns a boolean whenever a datapoint has a value set after using ".set_value()". Resets to false after calling `.reset()`
+- Added unit tests and an app that tests all supported controls at: `/tests/test_all_controls/main.py`
+- Added Dependancy between refs datapoints. If you create a datapoint with a certain Ref Object which default value is another flet control, to which you add another ref datapoint, the parent control will be updated when the child control does.
+- Important Notes:
+    - Memory: After testing the impact in the usage of this library seem to be minimal almost null. Still, more testing will be in progress.
+    - See all supported controls and their corresponding default values at [Supported Controls](#controls)
+
+<br>
+
+<a name="next-updates"></a>
+
+# What's next?
+
+The flet-mvc 0.1.0 it's a very stable and complete versions of this library. But we are still a few steps away from making it the real flet-mvc v1.0.0 package. Below you will find the topic for the next updates and what will they consist of:
+
+1. **The User's Control update**: This will cover the creation of a Flet User Control using the flet-mvc best practices and the corresponding send/receive decorator to comunicate between controls.
+2. **The Controller update**: This will include new controller functions that will make flet develpment and building controls easier; more alerts, options for dropdowns maybe, etc. (suggestions are very well received)
+3. **The DataTable update**: This will include practical controller functions that will allow the developer creating tables faster. Methods like:
+    - stablish_columns(columns: List[str])
+    - stablish_rows(rows: List[str])
+    - create_from_df(data=pd.DataFrame)
+    - create_from_dict(data=List[dict])
+    - download_df()
+    
+    *These method names are not official and will be part of the datapoints methods.
+    
+    Maybe some styling maybe, and pretty much everything realted to DataTables.
+4. **The Depancy Graph update**: This will be the biggest update and may take months of develoment. Were datapoints can depend on other datapoints (without the need of being ref objects) and can automatically affect the node/root values whenever the leaf changes. This will mark the era of the flet-mvc v1.0.0
+
+
+- **bug-fixes-updates**: simple bug-fixes, better typing exceptions, etc...
+
+<br>
+
+<a name="before"></a>
+# Before we start
+In case you want to go to a straighforward code example, please see the flet app where I am testing almost all flet controls with this library, and of course, following the strucure described here. The app is at:
+`/tests/test_all_controls/main.py`
+
+**KEEP IN MIND**, that it is a testing app, of course you don't need to add refdatapoints to every control in the ui. It's just showing the possibilities for all supported controls.
+
+**SPECIAL NOTE**: I made this library with love <3 - I really hope you can find this guide is useful! in case it's not, please feel free to reach me out and I will further explain any topic that is not clear or add the necessary changes to the code and documentation.
+
+You can find me in the Flet discort chanel which can be found in it's page: <a href="https://flet.dev/" target="_blank">Flet</a> at `third-party-packaged/flet-mvc`
+
+<br>
+<br>
 <a name="whatismvc"></a>
 
 # What is MVC?
@@ -42,7 +115,7 @@ Here is an image that explains this graphically:
 Image taken from Wikipedia.org
 
 <a name="fletandmvc"></a>
-
+<br>
 # Flet and MVC
 
 In Flet you can build a whole running application in just one file. But “just because you can, doesn’t mean you should”.
@@ -108,19 +181,12 @@ In the following paragraphs I will show you the basic template that each of the 
 
 Model -> ./models/main.py
 
-```
-from flet_mvc import data
+```python
+from flet_mvc import FletModel, data
 import flet as ft
 
 # Model
-class Model():
-    def __init__(self) -> None:
-        """
-        NOTE: __init__ method will be no longer needed
-        in flet-mvc version 1.0.0. The ref objects can
-        be created in a @data method like any datapoint.
-        """
-        self.ref_obj = ft.Ref[ft.Text]()
+class Model(FletModel):
     @data
     def example(self):
         return ...
@@ -129,7 +195,7 @@ class Model():
 
 ./views/main.py
 
-```
+```python
 from flet_mvc import FletView
 import flet as ft
 
@@ -147,7 +213,7 @@ class MainView(FletView):
 
 ./controllers/main.py
 
-```
+```python
 from flet_mvc import FletController
 
 # Controller
@@ -160,7 +226,7 @@ class Controller(FletController):
 
 app.py
 
-```
+```python
 import flet as ft
 from .controllers.main import Controller
 from .views.main import MainView
@@ -170,8 +236,9 @@ def main(page: ft.Page):
     # MVC set-up
     model = Model()
     controller = Controller(page, model)
+    model.controller = controller  # Optional, in case controller it's needed in the model.
     view = MainView(controller, model)
-    
+
     # Settings
     page.title = ""
 
@@ -195,34 +262,77 @@ Everything starts with the app.py, this script may be a little familiar to you i
 - Stablish the basic setting of your app (page), like the title, scroll, horizontal alignment, theme mode, etc. see <https://flet.dev/docs/controls/page/> for more page properties
 - And finally run the app by reading the content of your View class.
 
+One of the question that you may have is, *how do I add controls to the page properties like banner or overlay?* The answer to that question is that you will add every control into a view attributes and set them up in the "Settings" section. example:
+
+```python
+    # Settings
+    page.overlay.append(view.audio)
+    page.overlay.append(view.bottom_sheet)
+    page.overlay.append(view.file_picker)
+    page.appbar = view.app_bar
+    page.banner = view.banner
+    page.snack_bar = view.snack_bar
+    page.floating_action_button = view.fab
+
+```
+
+Just keep in mind that if you want to dinamically change them, you will be doing this set-up in the controller like:
+
+```python
+    # Inside a controller function
+    self.page.banner = self.model.Banner.current  # <- ref datapoint
+```
+
 Let’s continue to the view
 
 **View**
 
 Now let’s talk about the View class (which, as mentioned, I recommend having in the corresponding “views” folder).
 
-Here we will inherit *FletView* base class and create it’s “content” attribute a list of all the flet controls that our app will contain. The *FletView* base class will have access to the model and controller. This way we can set the flet controls to use our controller methods when an event occurs, here is an example of a flet TextField control using a ref object from the model and a controller method in the “on\_click“ and “on\_submit” argument:
+Here we will inherit *FletView* base class and create it’s “content” attribute as list of all the flet controls that our app will contain. <br>The *FletView* base class will have access to the model and controller. This way we can set the flet controls to use our controller methods when an event occurs. <br> Here is an example of a flet TextField control using a ref object from the model and a controller method in the “on\_click“ and “on\_submit” argument:
 
-```
+```python
 ft.TextField(
     hint_text="0.0",
-    ref=model.text_field_ref,
+    ref=model.TextFieldDatapoint,  # Setting the ref obj
     border=ft.InputBorder.NONE,
     filled=True,
     expand=True,
     keyboard_type="number",
-    on_change=controller.check_digits_only,
-    on_submit=controller.create_labels
+    on_change=controller.check_digits_only,  # Setting the function
+    on_submit=controller.create_labels,  # Setting the function
 ),
 ```
 
-**NOTE:** v.1.0.0 from flet-mvc will allow the usage of model datapoint as *Ref* objects. This will allow the developer to create a default value, access, edit, and restore the current value of a control **without the need of a real *Ref* object!** Stay tune for that!
+**NOTE:** Keep in mind that datapoints have default values which will be set in the controls automaitcally. In this case, the value of TextFieldDatapoint will modify the attribute "value" of the TextField control. To learn more about this see [Datapoints](#datapoints).
+
+Also, as we mentioned in the **App** section, in the view we can declare the controls that can be added to the flet page object. In this case we will need to add them into separate attributes. Following the example of the banner we mentioned before, the banner will look like this in the view:
+
+```python
+class MainView(FletView):
+    def __init__(self, controller, model):
+        self.banner = ft.Banner(  # <--
+            ref=model.Banner,
+            bgcolor=ft.colors.AMBER_100,
+            leading=ft.Icon(ft.icons.WARNING_AMBER_ROUNDED, color=ft.colors.AMBER, size=40),
+            actions=[
+                ...
+            ],
+        )
+
+        view = [
+            ... # List of "normal" flet controls
+        ]
+        super().__init__(model, view, controller)
+```
+
+and that is how now the banner could be set to the page by using the datapoint in the controller.py or by using this attribute in the app.py at the "Settings" section.
 
 Now let’s talk about the model before talking about the controller.
 
 **Model**
 
-The Model class doesn’t need to inherit any base class; but instead, create methods with the flet-mvc @data decorator. I like to call them datapoints.
+The Model class inherit the *FletModel* base class. Here is where we create methods with the flet-mvc @data decorator, which I like to call: **Datapoints**.
 
 In a VERY simple terms (maybe someone can get mad at me for saying this), the Model is a class that contains all the “variables” that the app will work with. These “variables” can have anything: from a Pandas DF obtained from SQL, Classes, Controls; to simple data types like strings, lists, int, etc. 
 
@@ -230,11 +340,8 @@ In order to create a “variable”/datapoint in the model, you only need to cre
 
 The benefits of having a datapoint is that it can be accessed from the Controller and **can be used as any other python datatype**, but **additionally**: it will allow you to **set** **it’s value** in case it’s needed and most importantly **reset** **it’s value**!
 
-\*\* As mentioned several times over this documentation, in the current flet version prior flet-mvc v.1.0.0., in order to create Ref objects in the model, you need to set the attributes in the class as:
+\*\* Since version *0.1.0: The datapoint update*,  Datapoint can also work as Flet Ref objects. For more information see: [Datapoints](#datapoints)
 
-```
-self.ref_obj = ft.Ref[ft.Text]()
-```
 
 **Controller**
 
@@ -242,43 +349,43 @@ I like to think that the Controller is the most relevant class from an applicati
 
 Essentially the controller class will inherit from flet-mvc *FletController* base class and in it you will define all the methods that *Flet controls* use to handle the events. (as mentioned in the View explanation)
 
-I want to talk in space about all the possibilities that the FletController allows you to do:
+Let's talk about all the possibilities that the FletController allows you to do:
 
 - **Access a model datapoint:**
 
-Let’s imagine in our Model we declare a “number” datapoint that return 0 by calculating 0+0:
-```
+Let’s imagine in our Model we declare a “number” datapoint that return 5 by calculating 2+3:
+```python
 @data
 def number(self):
-    return 0 + 0
+    return 2 + 3
 ```
 
-now in our Controller we have a “clicked” method called when a button is clicked. And we want to print the “number” value. We will achieve this by doing the following:
+now in our Controller we have a “clicked” method (which we assume is called when a button is clicked), and we want to print the “number” value. We will achieve this by doing the following:
 
-```
+```python
 class Controller(FletController):
 
     def clicked(self, e=None):
-        print(self.model.number())  # will print: 0
+        print(self.model.number())  # will print: 5
 ```
 
-\*notice how we call the datapoint by using the parethesis ()
+\*Notice how we call the datapoint by using the parethesis (), this returns the current value of the datapoint.
 
 - **Set a model datapoint with any other value:**
 
-Now let’s say we want to set our “number” datapoint value to 1 after we click it. Then we will use the **set\_value** property of the datapoint:
+Now let’s say we want to set our “number” datapoint value to 1 after we "click" it. Then we will use the **set\_value** property of the datapoint:
 
-```
+```python
 class Controller(FletController):
     
     def clicked(self, e=None):
-        print(self.model.number())  # will print: 0
+        print(self.model.number())  # will print: 5
         self.model.number.set_value(1)
         print(self.model.number())  # will print: 1
 ```
 This number is saved and can be latter used by another other controller method or even other Controller class as long as it has the model instance reference:
 
-```
+```python
     def clicked2(self, e=None):
         print(self.model.number())  # will print: 1
 
@@ -288,41 +395,35 @@ This number is saved and can be latter used by another other controller method o
 
 If we no longer need the set value and want to revert our change to this datapoint, it’s as easy as use the **reset** property:
 
-```
+```python
 class Controller(FletController):
     
     def clicked(self, e=None):
-        print(self.model.number())  # will print: 0
+        print(self.model.number())  # will print: 5
         self.model.number.set_value(1)
         print(self.model.number())  # will print: 1
         self.model.number.reset()
-        print(self.model.number())  # will print: 0 again after calculating 0+0 again.
+        print(self.model.number())  # will print: 5 again after calculating 2+3 again.
 ```
 
-- Access all controls properties by using the Ref objects declared in the model, it’s important to use the “current” property. 
+- Set the default value of a datapoint
 
-```
-        self.model.ref_obj.current.value = ""        
-        self.model.ref_obj.current.value
-        # plus any other property of the control
-```
+If by any chance we want to set a new default value whenever we reset a datapoint, we will use **set_default** property:
 
-This will later be removed by the flet-mvc v1.0.0 as I have been promising since the start of the guide. It will be used as any other datapoint and it will be updated in the View the moment we set it’s value.
-
-```
-        # set value
-        self.model.ref_obj.set_value("")
-        
-        # obtain value
-        self.model.ref_obj()
-        
-        # possibility to reset
-        self.model.ref_obj.reset()
+```python
+class Controller(FletController):
+    
+    def clicked(self, e=None):
+        print(self.model.number())  # will print: 5
+        self.model.number.set_value(1)
+        print(self.model.number())  # will print: 1
+        self.model.number.set_default(3)
+        self.model.number.reset()
+        print(self.model.number())  # will print: 3 which is the new default
 ```
 
-**To have in mind:**
+To learn more about datapoints please see [Datapoints](#datapoints).
 
-If we want to reset a datapoint and it contains a dependency with another datapoint, it won’t take the other datapoint current value, it will just take It’s default value. This dependencies will be provided in a later version of flet-mvc. Maybe v1.1.0
 
 <a name="extra"></a>
 
@@ -330,7 +431,7 @@ If we want to reset a datapoint and it contains a dependency with another datapo
 
 - The FletController base class also allows out app Controller to update the view, as we would do it with page.update() but just by running self.update() in a controller method, like this:
 
-```
+```python
     def clicked(self, e=None):
         self.update()
 ```
@@ -342,7 +443,7 @@ self.alert(“{your alert message}”, {alert type})
 
 
 Example:
-```
+```python
 self.alert("Alert Message", alert.WARNING)  # from flet_mvc import alert
 ```
 
@@ -351,7 +452,7 @@ alert shown:
 ![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.005.png)
 
 There are 5 different alerts, feel free to experiment with any of them.
-```
+```python
 WARNING = "warning"
 ERROR = "error"
 SUCCESS = "success"
@@ -359,4 +460,292 @@ INFO = "info"
 ADVICE = "advice"
 ```
 
-Hope this guide is useful, if not, please feel free to reach me out and I will further explain any topic that is not clear
+<a name="datapoints"></a>
+
+# Datapoints
+
+
+The data decorator in the Flet MVC framework is a powerful tool for defining Datapoints within a model. These datapoints form the backbone of your model's state and can be used to track, manipulate, and reference important data throughout the lifecycle of the Flet app.
+
+I recommend using PascalCase to define your datapoints. ()
+
+It's important to mention that there are three types of datapoints:
+
+- <u>Normal Datapoint</u>: This Datapoints are used as normal "variables" that can be used at any time of the App lifecycle, they can be any type of data that you need: Pandas Dataframes, objects, integers, strings, etc. The way to define this datapoints is simply by creating a method in the model with the @data decorator:
+
+    ```python
+    class Model(FletModel):
+        @data
+        def Example(self):
+            return "string type"
+    ```
+
+- <u>Normal Reference Data Points</u>: Normal reference data points are used when you want a Datapoint to affect the state of a Flet Control whenever these datapoints change their value. Also the returned type of this datapoint will be set to a specific attribute of the control, depending which one is it. Please see the section "Supported Flet Controls" below to learn more about the attributes affected. The way to define these datapoints is by declaring a normal datapoint, but adding it to a flet control `ref` attribute:
+
+    ```python
+    class Model(FletModel):
+        @data
+        def Example(self):
+            return "string type value"
+
+    class MainView(FletView):
+        def __init__(self, controller, model):
+            view = [
+                ft.Text(ref=model.Example)  # This converts the datapoint automatically to a Ref Obj
+            ]
+            super().__init__(model, view, controller)
+    ```
+
+- <u>Reference-Only Datapoints (RefOnly)</u>: Lastly, RefOnly Datapoints are meant to be used only for referencing. They cannot be directly set, reset, appended to, or retrieved like normal data points; also they should return a None value since it's returned value don't affect the state of the Flet Control. Any attempts to directly interact with a RefOnly data point will raise a TypeError.
+
+    Essentially they will fully work as normal Flet Ref Obj and in order to access the attributes of a control you will need to invoke the `.current` property. Don't forget to add it to the `ref` attribute of a Flet Control. The way to define them is by using the `@data.RefOnly` decorator:
+
+     ```python
+    class Model(FletModel):
+        @data.RefOnly  # <--
+        def Example(self):
+            return None  # Any other value will result in useless logic
+
+    class MainView(FletView):
+        def __init__(self, controller, model):
+            view = [
+                ft.Text(ref=model.Example, value="RefOnly") # Assigning
+            ]
+            super().__init__(model, view, controller)
+    ```
+
+
+As seen in the Controller section, here are some of the functionalities of the data decorator:
+
+## 1. Setting and Getting Data Point Values
+
+Once a data point is defined, its value can be set using the `set_value()` function, and retrieved simply by calling the data point as a function. For example:
+
+```python
+model = MockModel()
+model.datapoint.set_value("Test Value")
+print(model.datapoint())  # Prints: Test Value
+```
+If the Datapoint is a ref obj datapoint, it will only accept the expected type of the control. For example, seting a string value for a datapoint that needs an integer for it's defined attributes (see *Supported flet controls* section below), will raise an exception. Same error will be applied if the default returned value is not consintent with the control.
+## 2. Resetting Data Point Values
+
+The value of a data point can be reset to its initial value using the `reset()` function. For example:
+
+```python
+model.datapoint.reset()
+print(model.datapoint())  # Resets to it's initial defined value (unless it's set to a new default)
+```
+
+## 3. Setting a new default value
+
+In the case that you need to set a new default for a datapoint, you can always use the `set_default` function. For Example:
+
+```python
+print(model.datapoint()) # Initial declared value
+model.datapoint.set_default("new value")
+model.datapoint.reset()
+print(model.datapoint())  # Shows "new value"
+```
+
+
+## 4. Appending to List Data Points
+
+If a data point is a list, values can be appended to it using the `append()` function. Note that a normal append operation won't modify the `has_set_value` attribute of the data point.
+
+```python
+model.datapoint_list().append("Test Value")
+print(model.datapoint_list())  # Prints: ["Test Value"]
+```
+In case the Datapoint is a ref value with a data type of list (usually list of controls), then the append method can be directly called from the datapoint, it won't work otherwise.
+
+```python
+model.datapoint_list.append(ft.Text()"Test Value"))
+print(model.datapoint_list())  # Shows the full list of controls that the datapoint has.
+```
+
+## 5. Check if it has a value set
+
+Sometime you may want to see if a datapoint has changed of state and a value has been set. In order to solve that you can use the `has_set_value()` function, which will return a bool when the state has been set.
+
+```python
+print(model.datapoint.has_set_value()) # False
+model.datapoint.set_value(None)
+print(model.datapoint.has_set_value()) # True
+model.datapoint.reset()
+print(model.datapoint.has_set_value()) # False
+```
+
+## 6. Hard Reset (WARNING)
+
+There is also a hard reset method called `__hard_reset__()` which will completely reset the datapoint to a state where it was never assigned to any flet Control, loosing all reference and being in the limbo. I have been using this to test the same datapoint in multiple flet controls by losing reference of the previous ones.
+
+## 7. Multireference
+
+A Datapoint can save the reference of multiple controls at the same time, in other words, we are assinging the same datapoint to multiple controls (that's why in order to assign a datapoint to another control you first need to call the __hard__reset__() method as mentioned above). This should be only used when you are sure the controls have the same attribute to be set by the ref datapoint. This can be useful when you have multiple copies of the same control. Not sure if it's needed but added this possibility.
+
+## 8. Current property
+
+The `.current` property can only be used by Ref Datapoints, either normal ones or RefOnly datapoints. The value returned by this property it's the referenced flet Control itself. This way you can access all the attributes of a control in the controller.
+
+## 9. Control Dependencies
+
+This is where the magic can happen. Let's say you have a dialog component:
+
+
+```python
+ft.AlertDialog(ref=model.Dialog, title=ft.Text("Title"))
+```
+
+If you look at the section below you will see that the Ref Datapoint will affect the content of the Dialog, but not the title, but what if we also what to have the text of the title in another datapoint so that it can change of state depending on a controller event? Well, we could define another ref datapoint to this text!
+
+```python
+ft.AlertDialog(ref=model.Dialog, title=ft.Text(ref=model.Text))
+```
+
+Hence our model datapoint will look like this:
+
+```python
+@data
+def Text(self):
+    return "Title"
+
+@data
+def Dialog(self):
+    return ft.Text("This is my dialog content")
+```
+
+but as you can see there is even more levels to the Dialog datapoint, so we can even add more ref objects from the "self" model.
+
+```python
+@data
+def Text(self):
+    return "Title"
+
+@data
+def Dialog(self):
+    return ft.Text(ref=self.DialogContentText)
+
+@data
+def DialogContentText(self):
+    return "This is my dialog content"
+```
+you see where I am going? I know this example is a little useless, but it can illustrate the power of ref datapoint, and even more because if we do a `self.model.Text.set_value("new_title")` in the controller, it will automatically affect the root Control which will be the AlertDialog.
+
+Just for the record, another way to do this will be the following:
+
+```python
+dialog = ft.AlertDialog(content=ft.Text(ref=model.DialogContentText) title=ft.Text(ref=model.Text)) 
+
+# assigned to variable so I can set it in the page dialog attribute. *See the banner example at the View Section above.
+```
+this way I am only using two datapoint instead of three, but sometimes have that third one is useful.
+
+<br>
+
+## Supported flet controls:
+
+| Control                 | Attribute    | Type       |
+|-------------------------|--------------|------------|
+| ft.TextField            | value        | str        |
+| ft.AlertDialog          | content      | Control    |
+| ft.AnimatedSwitcher     | content      | Control    |
+| ft.AppBar               | actions      | list       |
+| ft.Audio                | src          | str        |
+| ft.Banner               | content      | Control    |
+| ft.BottomSheet          | content      | Control    |
+| ft.Card                 | content      | Control    |
+| ft.Checkbox             | value        | Bool       |
+| ft.CircleAvatar         | content      | Control    |
+| ft.Column               | controls     | list       |
+| ft.Container            | content      | Control(s?)|
+| ft.DataTable            | rows         | list       |
+| ft.DataRow              | cells        | list       |
+| ft.Draggable            | content      | Control    |
+| ft.DragTarget           | content      | Control    |
+| ft.Dropdown             | options      | list       |
+| ft.ElevatedButton       | text         | str        |
+| ft.FilledButton         | text         | str        |
+| ft.FilledTonalButton    | text         | str        |
+| ft.FloatingActionButton | text         | str        |
+| ft.GestureDetector      | content      | Control    |
+| ft.GridView             | controls     | list       |
+| ft.Icon                 | name         | str        |
+| ft.Image                | src          | str        |
+| ft.ListTile             | title        | Control    |
+| ft.ListView             | controls     | list       |
+| ft.Markdown             | value        | str        |
+| ft.NavigationBar        | destinations | list       |
+| ft.NavigationRail       | destinations | list       |
+| ft.OutlinedButton       | text         | str        |
+| ft.PopupMenuItem        | text         | str        |
+| ft.PopupMenuButton      | items        | list       |
+| ft.ProgressBar          | value        | float      |
+| ft.ProgressRing         | value        | float      |
+| ft.Radio                | value        | str        |
+| ft.RadioGroup           | value        | str        |
+| ft.ResponsiveRow        | controls     | list       |
+| ft.Row                  | controls     | list       |
+| ft.ShaderMask           | content      | Control    |
+| ft.Slider               | value        | int        |
+| ft.Stack                | controls     | list       |
+| ft.Switch               | value        | bool       |
+| ft.Tabs                 | tabs         | list       |
+| ft.Text                 | value        | str        |
+| ft.TextButton           | text         | str        |
+| ft.TextField            | value        | str        |
+| ft.TextSpan             | text         | str        |
+| ft.Tooltip              | content      | Control    |
+| ft.TransparentPointer   | content      | ----       |
+| ft.WindowDragArea       | content      | Control    |
+| ft.canvas.Canvas        | shapes       | list       |
+
+
+Other supported controls are, but I woudld recommend using them as RefOnly datapoints:
+
+| Control                |
+|------------------------|
+| ft.DataColumn          |
+| ft.Divider             |
+| ft.DataCell            |
+| ft.FilePicker          |
+| ft.HapticFeedback      |
+| ft.IconButton          |
+| ft.InlineSpan          |
+| ft.Semantics           |
+| ft.ShakeDetector       |
+| ft.SnackBar            |
+| ft.VerticalDivider     |
+
+
+MatplotlibChart, PlotlyChart, LineChart, BarChart, PieChart Controls are still missing some testing.
+
+<a name="common-mistakes"></a>
+
+# Common Mistakes
+If you have any issues in your code is possible that these are the possible mistakes:
+
+1. <u>Forget to add the Ref-Datapoint to a Flet Control</u>: Keep in consideration that if you want to use a model datapoint as Ref-Object or RefOnly-Object **you need to assign it to a Flet control!** Else you won't be seeing any change being made in the UI.
+
+    Example:
+
+    ```python
+    ft.Text(ref=model.MyRefDatapoint)
+    ```
+
+2. <u>Forget to use current attribute of a Ref-Object Datapoint in the Controller:</u> When working with Ref-Object Datatpoints, it's possible to forget using the *current* property. This one will actually return the Flet Control that you are referencing. So it's important to call current when accessing any other arrtribute of a Control.
+
+    Example:
+    ```python
+    # Inside a controller function:
+    self.model.MyRefDatatpoint.current.icon
+    ```
+
+3. <u>Calling the model datapoints and controller functions in the Flet controls:</u> In order to attach a datapoint to a Flet control, or adding the function to be triggered by an event of a flet control, it's important to specify only the object! not calling it!
+
+    Example:
+    ```python
+    # Wrong:
+    ft.ElevatedButton(ft.model.ButtonDatapoint(), on_click=controller.button_click())
+    # Correct (no parenthesis):
+    ft.ElevatedButton(ft.model.ButtonDatapoint, on_click=controller.button_click)
+    ```
