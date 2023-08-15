@@ -4,7 +4,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = "0.1.3"
+VERSION = "0.1.5"
 DESCRIPTION = (
     "This package will allow the developer to use an mvc structure in a Flet project."
 )
@@ -20,6 +20,13 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
+    package_data={
+        "mvc_commands": [
+            "templates/*",
+            "templates/*/*",
+            "templates/*/*/*",
+        ],
+    },
     install_requires=[
         "flet>=0.7.4",
         "click>=8.1.3",

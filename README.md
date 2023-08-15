@@ -41,7 +41,7 @@ Flet-mvc v.0.1.1 now includes new **quick start** commands that you can use in t
 
 **The commands:**
 
-- `flet-mvc start`: Creates the most basic MVC template for a flet app.
+- `flet-mvc start`: Creates the most basic MVC template for a flet app. It also includes the most basic usage of [Datapoints](#datapoints).
 - `flet-mvc routes`: Creates the basic MVC template for a routed flet app.
 - `flet-mvc tabs`: Creates the basic MVC template for a flet app that uses tabs. (advanced)
 
@@ -49,7 +49,7 @@ NOTE: The `flet-mvc tabs` command includes a concept of inheriting a modal insid
 
 
 # Version History
-### **Flet-mvc v0.1.2 and 0.1.3 - Fixes:**
+### **Flet-mvc v0.1.2 - 0.1.5 - Fixes:**
 - Bug fixes
 
 ### **Flet-mvc v0.1.1 - The template update:**
