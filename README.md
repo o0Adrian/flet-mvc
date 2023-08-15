@@ -17,6 +17,7 @@
 <br>
 
 # Content
+* [Quick Start](#quick-start)
 * [What's next?](#next-updates)
 * [Before we start](#before)
 * [What is MVC?](#whatismvc)
@@ -33,8 +34,26 @@
 * [Common Mistakes](#common-mistakes)
 
 
+<a name="quick-start"></a>
+
+# Quick Start: `flet-mvc` cli
+Flet-mvc v.0.1.1 now includes new **quick start** commands that you can use in the **terminal**. They will allow you to start developing right away, without the need of going though the effort of: looking for examples, copying old code as guidance, creating snippets or even reading this documentation every time you are in the need of starting a new Flet project with the MVC structure.
+
+**The commands:**
+
+- `flet-mvc start`: Creates the most basic MVC template for a flet app.
+- `flet-mvc routes`: Creates the basic MVC template for a routed flet app.
+- `flet-mvc tabs`: Creates the basic MVC template for a flet app that uses tabs. (advanced)
+
+NOTE: The `flet-mvc tabs` command includes a concept of inheriting a modal inside other modal. This would illustrate **one** solution when in the need of making a View interact/modify other views. Remember that these are just templates, feel free to modify as needed.
+
 
 # Version History
+### **Flet-mvc v0.1.1 - The template update:**
+- Bug fixes
+- Added new flet-mvc cli. See "Quick Start: flet-mvc cli"
+
+
 ### **Flet-mvc v0.1.0 - The datapoint update:**
 
 - Added Ref Datapoints:<br>Creating Ref objects is no longer a pain, the need of using `__init__` and attributes in the model has been removed. It's now as easy as creating a new datapoint and setting it up inside a flet control: `ft.Text(ref=model.MyRefDatapoint)`.<br>They will show the returned value to the flet Control automatically and change it's value whenever a value is set to this datapoints. For more information see  [Datapoints](#datapoints).
@@ -65,8 +84,8 @@ The flet-mvc 0.1.0 it's a very stable and complete versions of this library. But
     
     *These method names are not official and will be part of the datapoints methods.
     
-    Maybe some styling maybe, and pretty much everything realted to DataTables.
-4. **The Depancy Graph update**: This will be the biggest update and may take months of develoment. Were datapoints can depend on other datapoints (without the need of being ref objects) and can automatically affect the node/root values whenever the leaf changes. This will mark the era of the flet-mvc v1.0.0
+    Also some styling maybe, and pretty much everything realted to DataTables.
+4. **The Depancy Graph update**: This will be the biggest update and may take months of develoment. Were datapoints can depend on other datapoints (without the need of being ref objects) and can automatically affect the node/root values whenever the leaf changes. This will mark the era of the flet-mvc v1.0.0 (in the meantime use refs/datapoints for simple dependancies)
 
 
 - **bug-fixes-updates**: simple bug-fixes, better typing exceptions, etc...
@@ -173,7 +192,7 @@ This way we can keep the project completely scalable and maintainable.
 
 In the following paragraphs I will show you the basic template that each of the MVC python scripts contain. You can start building your app on top of these templates right away.
 
-**NOTE**: I fully encourage you to create User snippets like *flet\_model*, *flet*\_*controller*, *flet\_view*, *flet\_app* to create each of the following blocks quicker.
+**NOTE**: You can now get the basic template when creating a new flet project by running the command `flet-mvc start` on v.0.1.1 - I would also encourage you to create User snippets.
 
 
 **Model:**

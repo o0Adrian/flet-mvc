@@ -1,0 +1,10 @@
+build/
+dist/
+flet_mvc.egg-info/
+.history
+.DS_Store
+myenv/
+.coverage
+__pycache__
+.coveragerc
+*.pyc
