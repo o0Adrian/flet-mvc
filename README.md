@@ -7,7 +7,7 @@
   <br>
 </h1>
 
-<h4 align="center">The coding best practices for <a href="https://flet.dev/" target="_blank">Flet</a>.</h4>
+<h4 align="center">The coding best practices for <a href="https://flet.dev/" target="_blank">Flet</a>. (Works with Flet v0.9.0)</h4>
 
 <p align="center">
     <img src=https://img.shields.io/pypi/pyversions/flet-mvc>
@@ -37,7 +37,7 @@
 <a name="quick-start"></a>
 
 # Quick Start: `flet-mvc` cli
-Flet-mvc v.0.1.1 now includes new **quick start** commands that you can use in the **terminal**. They will allow you to start developing right away, without the need of going though the effort of: looking for examples, copying old code as guidance, creating snippets or even reading this documentation every time you are in the need of starting a new Flet project with the MVC structure.
+Flet-mvc v.0.1.5 now includes new **quick start** commands that you can use in the **terminal**. They will allow you to start developing right away, without the need of going though the effort of: looking for examples, copying old code as guidance, creating snippets or even reading this documentation every time you are in the need of starting a new Flet project with the MVC structure.
 
 **The commands:**
 
@@ -49,12 +49,13 @@ NOTE: The `flet-mvc tabs` command includes a concept of inheriting a modal insid
 
 
 # Version History
-### **Flet-mvc v0.1.2 - 0.1.5 - Fixes:**
+### **Flet-mvc v0.1.5 - The template update:**
 - Bug fixes
+- Added new flet-mvc cli. See "Quick Start: flet-mvc cli" [STABLE VERSION]
 
-### **Flet-mvc v0.1.1 - The template update:**
+### **Flet-mvc v0.1.1 - v0.1.4 - Unstable versions!:**
 - Bug fixes
-- Added new flet-mvc cli. See "Quick Start: flet-mvc cli"
+- Added new flet-mvc cli [ERRORS FOUND]
 
 
 ### **Flet-mvc v0.1.0 - The datapoint update:**
@@ -195,7 +196,7 @@ This way we can keep the project completely scalable and maintainable.
 
 In the following paragraphs I will show you the basic template that each of the MVC python scripts contain. You can start building your app on top of these templates right away.
 
-**NOTE**: You can now get the basic template when creating a new flet project by running the command `flet-mvc start` on v.0.1.1 - I would also encourage you to create User snippets.
+**NOTE**: You can now get the basic template when creating a new flet project by running the command `flet-mvc start` on v.0.1.5 - I would also encourage you to create User snippets.
 
 
 **Model:**
@@ -722,7 +723,7 @@ this way I am only using two datapoint instead of three, but sometimes have that
 | ft.canvas.Canvas        | shapes       | list       |
 
 
-Other supported controls are, but I woudld recommend using them as RefOnly datapoints:
+Other supported controls are, but I would recommend using them as RefOnly datapoints:
 
 | Control                |
 |------------------------|
