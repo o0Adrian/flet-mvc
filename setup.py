@@ -4,7 +4,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 DESCRIPTION = (
     "This package will allow the developer to use an mvc structure in a Flet project."
 )
@@ -36,7 +36,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "flet-mvc=mvc_setup.cli:cli",
+            "flet-mvc=mvc_commands.cli:cli",
         ],
     },
     classifiers=[
