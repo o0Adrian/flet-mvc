@@ -49,8 +49,8 @@ NOTE: The `flet-mvc tabs` command includes a concept of inheriting a modal insid
 
 
 # Version History
-### **Flet-mvc v0.1.2 - Fixes:**
-- Bug fix
+### **Flet-mvc v0.1.2 and 0.1.3 - Fixes:**
+- Bug fixes
 
 ### **Flet-mvc v0.1.1 - The template update:**
 - Bug fixes
