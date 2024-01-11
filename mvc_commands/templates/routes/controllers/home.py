@@ -2,6 +2,6 @@ from flet_mvc import FletController
 
 
 class HomeController(FletController):
-    def navigate_secundary(self, e):
+    def navigate_secondary(self, e):
         """Example route change"""
-        self.page.go("/secundary")
+        self.page.go("/secondary")

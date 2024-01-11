@@ -2,7 +2,7 @@ from flet_mvc import FletView
 import flet as ft
 
 
-class SecundaryView(FletView):
+class SecondaryView(FletView):
     def __init__(self, controller, model):
         view = [
             ft.Text(ref=model.example_title, size=30),

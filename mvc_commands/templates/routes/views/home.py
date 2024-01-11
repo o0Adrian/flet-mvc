@@ -7,7 +7,7 @@ class HomeView(FletView):
         view = [
             ft.Text(ref=model.example_title, size=30),
             ft.ElevatedButton(
-                "Go to secundary view", on_click=controller.navigate_secundary
+                "Go to secondary view", on_click=controller.navigate_secondary
             ),
         ]
         super().__init__(model, view, controller)

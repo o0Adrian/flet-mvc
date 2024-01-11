@@ -3,15 +3,15 @@ from flet_mvc import RouteHandler
 
 # Models
 from models.home import HomeModel
-from models.secundary import SecundaryModel
+from models.secondary import SecondaryModel
 
 # Views
 from views.home import HomeView
-from views.secundary import SecundaryView
+from views.secondary import SecondaryView
 
 # Controllers
 from controllers.home import HomeController
-from controllers.secundary import SecundaryController
+from controllers.secondary import SecondaryController
 
 
 def main(page: ft.Page):
@@ -25,12 +25,12 @@ def main(page: ft.Page):
     home_view = HomeView(home_controller, home_model)
     routes_handler.register_route("/", home_view.content)
 
-    # secundary view
-    secundary_model = SecundaryModel()
-    secundary_controller = SecundaryController(page, secundary_model)
-    secundary_model.controller = secundary_controller
-    secundary_view = SecundaryView(secundary_controller, secundary_model)
-    routes_handler.register_route("/secundary", secundary_view.content)
+    # secondary view
+    secondary_model = SecondaryModel()
+    secondary_controller = SecondaryController(page, secondary_model)
+    secondary_model.controller = secondary_controller
+    secondary_view = SecondaryView(secondary_controller, secondary_model)
+    routes_handler.register_route("/secondary", secondary_view.content)
 
     ### Page Settings ###
     theme = ft.Theme()
