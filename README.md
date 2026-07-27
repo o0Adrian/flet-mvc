@@ -1,777 +1,835 @@
-<h1 align="center">
-  <br>
-  [DEPRECATED, NO LONGER UPDATED DUE WORK + CHANGED TO REACT FOR PERSONAL PROJECTS, BUT STILL: FEEL FREE TO COLLABORATE]
-  <br>
-  <br>
-  [LOGO IN PROGRESS]
-  <br>
-  <br>
-  <strong>Flet-MVC</strong>
-  <br>
-</h1>
+# flet-mvc
 
-<h4 align="center">The coding best practices for <a href="https://flet.dev/" target="_blank">Flet</a>. (Works with Flet v0.9.0)</h4>
+Advanced reactive domain models for Flet, with an optional MVC project
+structure.
 
-<p align="center">
-    <img src=https://img.shields.io/pypi/pyversions/flet-mvc>
-    <img src=https://img.shields.io/pypi/dm/flet-mvc>
-    <img src=https://badge.fury.io/py/flet-mvc.svg>
-</p>
-<br>
+[English](https://github.com/o0Adrian/flet-mvc/blob/master/README.md) ·
+[Español](https://github.com/o0Adrian/flet-mvc/blob/master/README.es.md)
 
-# Content
-* [Quick Start](#quick-start)
-* [What's next?](#next-updates)
-* [Before we start](#before)
-* [What is MVC?](#whatismvc)
-* [Flet and MVC](#fletandmvc)
-* [The flet-mvc package](#package)
-    * [Installation](#installation)
-    * [Usage – How to implement MVC to a Flet App?](#usage)
-        * [Codebase structure:](#codebase)
-        * [Basic structure](#structure)
-        * [Explanation of the basic structure](#explanation)
-        * [Controller Extra abilities](#extra)
-    * [Datapoints](#datapoints)
-        * [Supported Controls](#controls)
-* [Common Mistakes](#common-mistakes)
+> The upcoming flet-mvc 1.0 targets Flet `>=0.86.3,<0.87` and Python 3.10 or
+> newer. The upper bound is intentional: a new Flet minor release is audited
+> before the range is widened.
 
+flet-mvc gives a domain model a little more structure than a plain observable:
 
-<a name="quick-start"></a>
+- `@data` declares mutable state;
+- `@computed` declares read-only derived state;
+- dependencies form a deterministic graph;
+- batches, snapshots, subscriptions, and control bindings are built in;
+- `FletModel` is a native `ft.Observable`, so it works with `@ft.component`.
 
-# Quick Start: `flet-mvc` cli
-Flet-mvc v.0.1.5 now includes new **quick start** commands that you can use in the **terminal**. They will allow you to start developing right away, without the need of going though the effort of: looking for examples, copying old code as guidance, creating snippets or even reading this documentation every time you are in the need of starting a new Flet project with the MVC structure.
+MVC is available when separating models, views, and controllers makes a
+project easier to maintain. It is not mandatory. Flet remains responsible for
+controls, `ft.View`, `ft.Router`, dialogs, navigation, rendering, and
+application lifecycle.
 
-**The commands:**
+## Choose a path
 
-- `flet-mvc start`: Creates the most basic MVC template for a flet app. It also includes the most basic usage of [Datapoints](#datapoints).
-- `flet-mvc routes`: Creates the basic MVC template for a routed flet app.
-- `flet-mvc tabs`: Creates the basic MVC template for a flet app that uses tabs. (advanced)
+- To build something now, follow [Quick start](#quick-start).
+- To learn the state API, read [Model state](#model-state).
+- To use class-oriented MVC, open [Optional MVC structure](#optional-mvc-structure).
+- To migrate old code, use the
+  [migration guide](https://github.com/o0Adrian/flet-mvc/blob/master/MIGRATION.md).
+- To bind a control, check the
+  [control matrix](https://github.com/o0Adrian/flet-mvc/blob/master/docs/CONTROL_COMPATIBILITY.md).
+- To review the Flet upgrade, read the
+  [release audit](https://github.com/o0Adrian/flet-mvc/blob/master/docs/FLET_RELEASE_AUDIT.md).
 
-NOTE: The `flet-mvc tabs` command includes a concept of inheriting a modal inside other modal. This would illustrate **one** solution when in the need of making a View interact/modify other views. Remember that these are just templates, feel free to modify as needed.
+## Install
 
+Create and activate a virtual environment:
 
-# Version History
-### **Flet-mvc v0.1.5 - The template update:**
-- Bug fixes
-- Added new flet-mvc cli. See "Quick Start: flet-mvc cli" [STABLE VERSION]
-
-### **Flet-mvc v0.1.1 - v0.1.4 - Unstable versions!:**
-- Bug fixes
-- Added new flet-mvc cli [ERRORS FOUND]
-
-
-### **Flet-mvc v0.1.0 - The datapoint update:**
-
-- Added Ref Datapoints:<br>Creating Ref objects is no longer a pain, the need of using `__init__` and attributes in the model has been removed. It's now as easy as creating a new datapoint and setting it up inside a flet control: `ft.Text(ref=model.MyRefDatapoint)`.<br>They will show the returned value to the flet Control automatically and change it's value whenever a value is set to this datapoints. For more information see  [Datapoints](#datapoints).
-- Added RefOnly Datapoints: <br> This datapoins can be using by declaring the following decorator: `@data.RefOnly`, the difference between the normal Ref datapoints is that this won't set any value to it's control by default, instead you will use it as any normal flet ref obj by calling `.current` and any needed attribute.
-- Added `.has_set_value()` method to the datapoint object, which returns a boolean whenever a datapoint has a value set after using ".set_value()". Resets to false after calling `.reset()`
-- Added unit tests and an app that tests all supported controls at: `/tests/test_all_controls/main.py`
-- Added Dependancy between refs datapoints. If you create a datapoint with a certain Ref Object which default value is another flet control, to which you add another ref datapoint, the parent control will be updated when the child control does.
-- Important Notes:
-    - Memory: After testing the impact in the usage of this library seem to be minimal almost null. Still, more testing will be in progress.
-    - See all supported controls and their corresponding default values at [Supported Controls](#controls)
-
-<br>
-
-<a name="next-updates"></a>
-
-# What's next?
-
-The flet-mvc 0.1.0 it's a very stable and complete versions of this library. But we are still a few steps away from making it the real flet-mvc v1.0.0 package. Below you will find the topic for the next updates and what will they consist of:
-
-1. **The User's Control update**: This will cover the creation of a Flet User Control using the flet-mvc best practices and the corresponding send/receive decorator to comunicate between controls.
-2. **The Controller update**: This will include new controller functions that will make flet develpment and building controls easier; more alerts, options for dropdowns maybe, etc. (suggestions are very well received)
-3. **The DataTable update**: This will include practical controller functions that will allow the developer creating tables faster. Methods like:
-    - stablish_columns(columns: List[str])
-    - stablish_rows(rows: List[str])
-    - create_from_df(data=pd.DataFrame)
-    - create_from_dict(data=List[dict])
-    - download_df()
-    
-    *These method names are not official and will be part of the datapoints methods.
-    
-    Also some styling maybe, and pretty much everything realted to DataTables.
-4. **The Depancy Graph update**: This will be the biggest update and may take months of develoment. Were datapoints can depend on other datapoints (without the need of being ref objects) and can automatically affect the node/root values whenever the leaf changes. This will mark the era of the flet-mvc v1.0.0 (in the meantime use refs/datapoints for simple dependancies)
-
-
-- **bug-fixes-updates**: simple bug-fixes, better typing exceptions, etc...
-
-<br>
-
-<a name="before"></a>
-# Before we start
-In case you want to go to a straighforward code example, please see the flet app where I am testing almost all flet controls with this library, and of course, following the strucure described here. The app is at:
-`/tests/test_all_controls/main.py`
-
-**KEEP IN MIND**, that it is a testing app, of course you don't need to add refdatapoints to every control in the ui. It's just showing the possibilities for all supported controls.
-
-**SPECIAL NOTE**: I made this library with love <3 - I really hope you can find this guide is useful! in case it's not, please feel free to reach me out and I will further explain any topic that is not clear or add the necessary changes to the code and documentation.
-
-You can find me in the Flet discort chanel which can be found in it's page: <a href="https://flet.dev/" target="_blank">Flet</a> at `third-party-packaged/flet-mvc`
-
-<br>
-<br>
-<a name="whatismvc"></a>
-
-# What is MVC?
-
-MVC stands for Model-View-Controller. It is a design pattern that is used to create software applications with a clear separation of concerns.
-
-- The Model represents the data and the business logic of the application. It is responsible for handling the data and performing any necessary computations.
-
-- The View is responsible for displaying the data to the user. It receives updates from the Model and renders them on the screen.
-
-- The Controller is responsible for handling user input and updating the Model and the View accordingly. It receives user input from the View and updates the Model with the new data, and then instructs the View to refresh the display with the new data.
-
-The MVC pattern helps in separation of concern, **maintainability** and testability** of the application and also **making it scalable.**
-
-In even simple terms:
-
-- The Model can update the view when it’s values are changed by the controller. or just a "container" of data used in the app.
-
-- The View is what you see and can interact with
-
-- The Controller receives user input from the View and updates the Model with the new data, and then instructs the View to refresh the display with the new data.
-
-Here is an image that explains this graphically:
-
-![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.001.png)
-
-Image taken from Wikipedia.org
-
-<a name="fletandmvc"></a>
-<br>
-# Flet and MVC
-
-In Flet you can build a whole running application in just one file. But “just because you can, doesn’t mean you should”.
-
-Here two disadvantages of not using an architecture (any):
-
-- Poor maintainability: A lack of separation of concerns can make it harder to maintain the codebase over time. This can lead to bugs and performance issues that are difficult to fix.
-
-- Lack of scalability: Applications that are not designed using the MVC pattern can be harder to scale as the number of users or amount of data increases. This is because the codebase may become more complex and harder to understand as it grows.
-
-- Just imagine receiving a +3000 lines of code app python file where every 100 lines a  new Flet Control is added to the view, methods all over the place and variables too. Good luck trying to fix a bug over there
-
-**Flet-mvc** python package provides the necessary components to assimilate an implementation of the MVC architectural pattern in Flet.
-
-<a name="package"></a>
-
-# The flet-mvc package
-
-<a name="installation"></a>
-
-## Installation
+```bash
+python -m venv .venv
 ```
-python3 -m pip install flet-mvc
+
+On macOS or Linux:
+
+```bash
+source .venv/bin/activate
 ```
-<a name="usage"></a>
 
-## Usage – How to implement MVC to a Flet App?
+On Windows PowerShell:
 
-<a name="codebase"></a>
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-### Codebase structure:
-In the following image you will find a basic code base structure to start working in a new app. 
+Install flet-mvc:
 
-![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.002.png)
+```bash
+python -m pip install --upgrade pip
+python -m pip install "flet-mvc>=1.0,<2"
+```
 
-This will keep the app maintenance and scalability on point.
+The package installs its tested Flet range automatically.
 
-**One more example**
+| flet-mvc | Flet | Python | Status |
+|---|---|---|---|
+| 1.0.x | `>=0.86.3,<0.87` | 3.10–3.14 | Current target |
+| 0.1.5 | 0.9.0 in practice | Historical | Legacy |
 
-Imagine a flet app that looks like this:
+## Quick start
 
-![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.003.png)
+This first application uses a flet-mvc model directly from Flet's declarative
+UI. There is no controller or custom view class to understand yet.
 
-This app example has an index view, this index view contains a layer and a navigation menu that will allow the user to change the view to three different tabs: Home, Statistics and Dashboard. Each view containing unique logic.
+Create `app.py`:
 
-How do we keep organized the code of this app? Using a similar MVC codebase structure. Something like this:
+```python
+import flet as ft
 
-![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.004.png)
-
-This way we can keep the project completely scalable and maintainable.
-
-<a name="structure"></a>
-
-### Basic structure
-
-In the following paragraphs I will show you the basic template that each of the MVC python scripts contain. You can start building your app on top of these templates right away.
-
-**NOTE**: You can now get the basic template when creating a new flet project by running the command `flet-mvc start` on v.0.1.5 - I would also encourage you to create User snippets.
+from flet_mvc import FletModel, computed, data
 
 
-**Model:**
+class CounterModel(FletModel):
+    @data
+    def count(self) -> int:
+        return 0
+
+    @computed
+    def message(self) -> str:
+        return f"Count: {self.count.value}"
 
 
-Model -> ./models/main.py
+@ft.component
+def Counter(model: CounterModel) -> ft.Control:
+    return ft.Column(
+        controls=[
+            ft.Text(model.message.value, size=28),
+            ft.Button(
+                content="Add one",
+                icon=ft.Icons.ADD,
+                on_click=lambda: model.count.update(lambda value: value + 1),
+            ),
+        ]
+    )
+
+
+def main(page: ft.Page) -> None:
+    page.title = "Reactive counter"
+    page.render(Counter, CounterModel())
+
+
+if __name__ == "__main__":
+    ft.run(main)
+```
+
+Run it:
+
+```bash
+python app.py
+```
+
+Each click follows one predictable flow:
+
+```text
+Button event
+  → count.update(...)
+  → count changes
+  → message is recomputed
+  → Flet observes the model
+  → Counter renders the new values
+```
+
+No `page.update()` is needed in this declarative example.
+
+## Model state
+
+### Mutable state with `@data`
+
+The decorated method supplies the default value. Every model instance owns
+independent datapoints.
 
 ```python
 from flet_mvc import FletModel, data
-import flet as ft
 
-# Model
-class Model(FletModel):
+
+class OrderModel(FletModel):
     @data
-    def example(self):
-        return ...
-```
-**View**
+    def quantity(self) -> int:
+        return 1
 
-./views/main.py
+    @data
+    def unit_price(self) -> float:
+        return 9.50
+
+
+first = OrderModel()
+second = OrderModel(quantity=3)
+
+assert first.quantity.value == 1
+assert second.quantity.value == 3
+
+first.quantity.set(2)
+first.quantity.update(lambda quantity: quantity + 1)
+assert first.quantity.value == 3
+
+first.quantity.reset()
+assert first.quantity.value == 1
+```
+
+Use:
+
+- `point.value` to read;
+- `point.set(value)` to replace a value;
+- `point.update(transform)` to derive the next value from the current one;
+- `point.reset()` to evaluate its `@data` method again.
+
+Do not assign `model.quantity = 2`; the descriptor rejects direct assignment
+so changes cannot bypass propagation.
+
+The descriptors are generic. A method returning `int` becomes a
+`Datapoint[int]`, so type checkers validate `.value`, `set()`, `update()`, and
+`use_datapoint()` without extra annotations.
+
+### Derived state with `@computed`
+
+A computed datapoint is read-only. flet-mvc records which datapoints it reads
+and recomputes it after any dependency changes.
 
 ```python
-from flet_mvc import FletView
-import flet as ft
+from flet_mvc import FletModel, computed, data
 
-# View
-class MainView(FletView):
-    def __init__(self, controller, model):
-        view = [
-            ... # List of flet controls
+
+class OrderModel(FletModel):
+    @data
+    def quantity(self) -> int:
+        return 1
+
+    @data
+    def unit_price(self) -> float:
+        return 9.50
+
+    @computed
+    def total(self) -> float:
+        return self.quantity.value * self.unit_price.value
+
+
+model = OrderModel()
+assert model.total.value == 9.50
+
+model.quantity.set(4)
+assert model.total.value == 38.0
+```
+
+Calling `set()`, `update()`, or `reset()` on `total` raises `TypeError`.
+Change its source data instead.
+
+Dependencies can change at runtime. For example, a computed property may read
+`personal_price` in one branch and `business_price` in another. The graph
+removes stale edges when the active branch changes.
+
+If a dependency is hidden behind code that does not read the datapoint during
+evaluation, declare it:
+
+```python
+class SearchModel(FletModel):
+    @data
+    def query(self) -> str:
+        return ""
+
+    @computed.depends_on("query")
+    def normalized_query(self) -> str:
+        return normalize_external_query(self.query.value)
+```
+
+`normalize_external_query` is an application function in this example.
+Unknown dependencies and cycles fail with a specific dependency error.
+
+### Replace collections instead of mutating them silently
+
+Use `update()` to return a new collection:
+
+```python
+from flet_mvc import FletModel, data
+
+
+class WorkspaceModel(FletModel):
+    @data
+    def items(self) -> list[dict]:
+        return []
+
+    @data
+    def filters(self) -> dict:
+        return {}
+
+
+model = WorkspaceModel()
+new_item = {"id": 3, "name": "Document"}
+model.items.update(lambda items: [*items, new_item])
+model.filters.update(lambda filters: {**filters, "active": True})
+```
+
+An in-place mutation such as `model.items.value.append(new_item)` changes the
+Python list without telling the dependency graph. Prefer immutable-style
+updates like the example above.
+
+### Subscribe to changes
+
+Subscribers receive an immutable `DatapointChange`. The returned function
+unsubscribes safely, even when called more than once.
+
+```python
+def report(change) -> None:
+    print(change.name, change.old_value, change.new_value, change.source)
+
+
+unsubscribe = model.total.subscribe(report, fire_immediately=True)
+model.quantity.set(2)
+unsubscribe()
+```
+
+Synchronous and asynchronous subscribers are supported. Notifications run
+after the dependency graph has reached a consistent state.
+
+### Batch related changes
+
+`batch()` delays propagation until the outermost block exits. Each affected
+computed datapoint is evaluated once with the final source values.
+
+```python
+with model.batch():
+    model.quantity.set(2)
+    model.unit_price.set(20.0)
+
+assert model.total.value == 40.0
+```
+
+Nested batches join the same outer transaction. The outermost `batch()` is an
+atomic commit boundary: if an exception escapes its body, or a computed value
+or control binding fails while the graph is stabilizing, flet-mvc restores the
+previous mutable and computed values, bound control properties, dependency
+edges, pending queues, and `model.revision`. Datapoint subscribers and the
+native model observable are not notified about the failed commit.
+
+This rollback protects the in-memory model graph; it cannot undo database,
+file, network, or other side effects performed by application code.
+
+### Save and restore model state
+
+```python
+saved = model.snapshot()
+
+model.quantity.set(99)
+model.restore(saved)
+
+assert model.quantity.value == saved["quantity"]
+```
+
+Snapshots are shallow dictionaries containing mutable `@data` values.
+Computed values are omitted because restoring their dependencies recreates
+them. `restore(values, strict=False)` ignores unknown keys, which is useful
+when loading older saved data. Snapshots are useful for persistence and manual
+state capture; `batch()` does not require one to roll back a failed commit.
+
+### Inspect the dependency graph
+
+```python
+print(model.dependency_graph)
+print(model.dependency_dot())
+```
+
+`dependency_graph` maps each datapoint to the names it depends on.
+`dependency_dot()` returns Graphviz DOT for debugging or visualization.
+
+## Use the model with native Flet
+
+### Declarative components
+
+`FletModel` inherits `ft.Observable`. Pass a model to `@ft.component`, read
+its datapoint values while rendering, and let Flet schedule the rerender.
+This is the recommended starting point for new declarative applications.
+
+```python
+@ft.component
+def OrderSummary(model: OrderModel) -> ft.Control:
+    return ft.Column(
+        controls=[
+            ft.Text(f"Quantity: {model.quantity.value}"),
+            ft.Text(f"Total: ${model.total.value:.2f}"),
+            ft.Button(
+                content="Add item",
+                on_click=lambda: model.quantity.update(lambda value: value + 1),
+            ),
         ]
-        super().__init__(model, view, controller)
+    )
 ```
 
+Use Flet hooks, contexts, and routers normally. flet-mvc does not introduce a
+second rendering system.
 
-**Controller**
-
-./controllers/main.py
+Passing the whole model makes the component observe model commits. For a
+smaller rerender boundary, `use_datapoint(point)` subscribes only to that
+datapoint and disposes the subscription when the component unmounts:
 
 ```python
-from flet_mvc import FletController
+from flet_mvc import use_datapoint
 
-# Controller
-class Controller(FletController):
-    ...
+
+@ft.component
+def QuantityValue(point) -> ft.Control:
+    quantity = use_datapoint(point)
+    return ft.Text(f"Quantity: {quantity}")
 ```
 
+Like every Flet hook, call `use_datapoint()` unconditionally and only inside
+an `@ft.component` body.
 
-**App**
+There are two intentionally different subscription contracts:
 
-app.py
+| API | Callback receives | Use |
+|---|---|---|
+| `point.subscribe(...)` | one `DatapointChange` | Observe a specific value |
+| `model.subscribe(...)` | `(sender, field)` | Native `ft.Observable` contract |
+
+A stable datapoint commit notifies the model once with `field=None`.
+`model.revision` increments once for each such commit, including one increment
+for a whole outer `batch()`; no-op assignments do not increment it. Regular
+public attributes on the model retain normal Flet Observable notifications
+with their field name.
+
+### Imperative control bindings
+
+Bindings are useful in an imperative screen or when a specific control should
+receive updates without rebuilding a larger component.
+
+```python
+class ProfileModel(FletModel):
+    @data
+    def name(self) -> str:
+        return "Ada"
+
+
+model = ProfileModel()
+field = ft.TextField(ref=model.name, label="Name")
+preview = ft.Text(ref=model.name)
+
+model.name.set("Grace")
+assert field.value == "Grace"
+assert preview.value == "Grace"
+```
+
+For a registered input control, flet-mvc also wraps its current change event.
+Typing into `field` pulls `field.value` into the model, preserves the original
+event handler, and propagates the result.
+
+Automatic inference is deliberately limited to 21 controls with one stable
+state field. Structural properties such as `controls`, `content`, `actions`,
+`options`, and `rows` are never guessed. Bind those explicitly:
+
+```python
+class BoardModel(FletModel):
+    @data
+    def cards(self) -> list[ft.Control]:
+        return []
+
+
+model = BoardModel()
+board = ft.Column()
+model.cards.bind(board, "controls")
+
+model.cards.set([ft.Text("First"), ft.Text("Second")])
+model.cards.sync()
+model.cards.pull(board)
+model.cards.unbind(board)
+```
+
+The complete fields and events are in
+[`docs/CONTROL_COMPATIBILITY.md`](https://github.com/o0Adrian/flet-mvc/blob/master/docs/CONTROL_COMPATIBILITY.md).
+
+For a custom control class with one stable state field, register the contract
+once:
+
+```python
+register_control_binding(
+    MyControl,
+    "selection",
+    expected_type=str,
+    event="on_change",
+)
+```
+
+For only one instance, prefer
+`point.bind(control, "selection")`. An unsafe or unknown implicit binding
+raises `UnsupportedControlError` with instructions instead of guessing.
+
+### Control references
+
+Use Flet's own `ft.Ref` when you need the control object rather than a reactive
+value:
+
+```python
+name_ref = ft.Ref[ft.TextField]()
+
+
+async def focus_name() -> None:
+    if name_ref.current is not None:
+        await name_ref.current.focus()
+
+
+field = ft.TextField(ref=name_ref, label="Name")
+```
+
+Keep this reference beside the UI that owns the control.
+
+## Model-aware composite controls
+
+`FletComponent` is a native `@ft.control` subclass of `ft.Column`. Use it when
+a reusable control needs lifecycle-managed communication with a model.
+
+`@send(Model.field)` publishes the method's return value.
+`@receive(Model.field)` subscribes on mount and unsubscribes on unmount.
 
 ```python
 import flet as ft
-from .controllers.main import Controller
-from .views.main import MainView
-from .models.main import Model
 
-def main(page: ft.Page):
-    # MVC set-up
-    model = Model()
-    controller = Controller(page, model)
-    model.controller = controller  # Optional, in case controller it's needed in the model.
-    view = MainView(controller, model)
+from flet_mvc import FletComponent, FletModel, data, receive, send
 
-    # Settings
-    page.title = ""
 
-    # Run
-    page.add(
-        *view.content
+class CounterModel(FletModel):
+    @data
+    def count(self) -> int:
+        return 0
+
+
+@ft.control
+class CounterPanel(FletComponent):
+    def init(self) -> None:
+        super().init()
+        self.count_text = ft.Text(size=32)
+        self.controls = [
+            self.count_text,
+            ft.Button(content="Add one", on_click=self.increment),
+        ]
+
+    @receive(CounterModel.count)
+    def show_count(self, value: int) -> None:
+        self.count_text.value = str(value)
+
+    @send(CounterModel.count)
+    def increment(self, _event=None) -> int:
+        return self.model.count.value + 1
+
+
+panel = CounterPanel(model=CounterModel())
+```
+
+Both decorators accept synchronous and asynchronous methods.
+`@receive` fires immediately by default; pass `fire_immediately=False` when
+only later changes matter. Return `NO_CHANGE` from a `@send` method when an
+event should leave the target untouched. Returning `None` deliberately sets
+the datapoint to `None`.
+
+An asynchronous `@send` method must be declared with `async def`. A regular
+`def` that returns an awaitable raises `TypeError`, matching Flet's event
+contract instead of silently dropping the coroutine.
+
+After a receiver changes child controls, `FletComponent` updates only its own
+subtree. Declarative components and controls bound elsewhere keep their own
+Flet update lifecycle; a receiver does not force a whole-page update.
+
+For ordinary UI composition, prefer Flet's lighter `@ft.component`. Use
+`FletComponent` specifically when send/receive and mount cleanup are useful.
+
+## Optional MVC structure
+
+MVC is a directory and responsibility boundary, not a required runtime layer:
+
+```text
+my_app/
+├── app.py
+├── controllers/
+│   └── todo.py
+├── models/
+│   └── todo.py
+└── views/
+    └── todo.py
+```
+
+- The **Model** owns domain state and rules.
+- The **View** returns native Flet controls, an `ft.View`, or a component.
+- The **Controller** translates UI actions into model operations.
+- `app.py` creates fresh session objects and connects them.
+
+`models/todo.py`:
+
+```python
+from flet_mvc import FletModel, data
+
+
+class TodoModel(FletModel):
+    @data
+    def title(self) -> str:
+        return "Learn Flet MVC"
+```
+
+`controllers/todo.py`:
+
+```python
+from dataclasses import dataclass
+
+from models.todo import TodoModel
+
+
+@dataclass
+class TodoController:
+    model: TodoModel
+
+    def rename(self, _event=None) -> None:
+        self.model.title.set("Build the application")
+```
+
+`views/todo.py`:
+
+```python
+import flet as ft
+
+from controllers.todo import TodoController
+
+
+def build_view(controller: TodoController) -> ft.Control:
+    return ft.Column(
+        controls=[
+            ft.Text(ref=controller.model.title, size=28),
+            ft.Button(content="Rename", on_click=controller.rename),
+        ]
+    )
+```
+
+`app.py`:
+
+```python
+import flet as ft
+
+from controllers.todo import TodoController
+from models.todo import TodoModel
+from views.todo import build_view
+
+
+def main(page: ft.Page) -> None:
+    model = TodoModel()
+    controller = TodoController(model)
+    page.add(build_view(controller))
+
+
+if __name__ == "__main__":
+    ft.run(main)
+```
+
+Create the model inside `main()`. Flet invokes `main()` for each session, so
+module-level models would accidentally share state between users.
+
+The controller is an ordinary application class; `@dataclass` only removes
+boilerplate. A function or service object works just as well. flet-mvc exports
+no controller base. Pass `page` into a controller only when that controller
+actually navigates or opens a Flet service. Dialogs, dropdown options, updates,
+and navigation use Flet directly.
+
+## Native routing and views
+
+Use the official `ft.Router`, `ft.Route`, `ft.View`, and `@ft.component`.
+flet-mvc does not maintain a parallel route handler.
+
+```python
+import flet as ft
+
+
+@ft.component
+def Home() -> ft.Control:
+    return ft.Text("Home", size=28)
+
+
+@ft.component
+def About() -> ft.Control:
+    return ft.Text("About", size=28)
+
+
+@ft.component
+def App() -> ft.Control:
+    page = ft.context.page
+    return ft.Column(
+        controls=[
+            ft.Row(
+                controls=[
+                    ft.Button(content="Home", on_click=lambda: page.navigate("/")),
+                    ft.Button(
+                        content="About",
+                        on_click=lambda: page.navigate("/about"),
+                    ),
+                ]
+            ),
+            ft.Router(
+                routes=[
+                    ft.Route(index=True, component=Home),
+                    ft.Route(path="about", component=About),
+                ]
+            ),
+        ]
     )
 
-ft.app(target=main)
+
+def main(page: ft.Page) -> None:
+    page.render(App)
+
+
+if __name__ == "__main__":
+    ft.run(main)
 ```
 
-<a name="explanation"></a>
+For mobile back gestures and a real view stack, set
+`ft.Router(..., manage_views=True)`, return `ft.View` objects from route
+components, and call `page.render_views(App)`. See Flet's official
+[Router guide](https://flet.dev/docs/controls/router/).
 
-### Explanation of the basic structure:
+## Data tables
 
-**App**
+`DataTableAdapter` builds and exports a native `ft.DataTable`. The Flet control
+is always available through `adapter.control`.
 
-Everything starts with the app.py, this script may be a little familiar to you if you have already worked with flet. Here you will:
-
-- Set-up the MVC classes (I will explain each of them in a moment)
-- Stablish the basic setting of your app (page), like the title, scroll, horizontal alignment, theme mode, etc. see <https://flet.dev/docs/controls/page/> for more page properties
-- And finally run the app by reading the content of your View class.
-
-One of the question that you may have is, *how do I add controls to the page properties like banner or overlay?* The answer to that question is that you will add every control into a view attributes and set them up in the "Settings" section. example:
+### Load records
 
 ```python
-    # Settings
-    page.overlay.append(view.audio)
-    page.overlay.append(view.bottom_sheet)
-    page.overlay.append(view.file_picker)
-    page.appbar = view.app_bar
-    page.banner = view.banner
-    page.snack_bar = view.snack_bar
-    page.floating_action_button = view.fab
+import flet as ft
 
+from flet_mvc import DataTableAdapter
+
+
+adapter = DataTableAdapter().load_records(
+    [
+        {"name": "Ada", "score": 98},
+        {"name": "Grace", "score": 95},
+    ]
+)
+
+table_control = adapter.control
+assert isinstance(table_control, ft.DataTable)
+print(adapter.to_records())
+print(adapter.to_csv())
 ```
 
-Just keep in mind that if you want to dinamically change them, you will be doing this set-up in the controller like:
+Keys are collected in first-seen order. Missing values become `None`.
+
+### Set a schema and rows
 
 ```python
-    # Inside a controller function
-    self.page.banner = self.model.Banner.current  # <- ref datapoint
+adapter = DataTableAdapter()
+adapter.set_columns(["name", "score"], numeric="score")
+adapter.set_rows(
+    [
+        ["Ada", 98],
+        {"name": "Grace", "score": 95},
+    ]
+)
 ```
 
-Let’s continue to the view
+Rows may be sequences, mappings, or existing `ft.DataRow` objects. Column and
+visible-cell counts are validated before the table is updated.
 
-**View**
-
-Now let’s talk about the View class (which, as mentioned, I recommend having in the corresponding “views” folder).
-
-Here we will inherit *FletView* base class and create it’s “content” attribute as list of all the flet controls that our app will contain. <br>The *FletView* base class will have access to the model and controller. This way we can set the flet controls to use our controller methods when an event occurs. <br> Here is an example of a flet TextField control using a ref object from the model and a controller method in the “on\_click“ and “on\_submit” argument:
+### DataFrames and CSV files
 
 ```python
-ft.TextField(
-    hint_text="0.0",
-    ref=model.TextFieldDatapoint,  # Setting the ref obj
-    border=ft.InputBorder.NONE,
-    filled=True,
-    expand=True,
-    keyboard_type="number",
-    on_change=controller.check_digits_only,  # Setting the function
-    on_submit=controller.create_labels,  # Setting the function
-),
+adapter.load_dataframe(frame)
+frame_copy = adapter.to_dataframe()
+
+
+async def export_table() -> None:
+    await adapter.save_csv(file_name="scores.csv")
 ```
 
-**NOTE:** Keep in mind that datapoints have default values which will be set in the controls automaitcally. In this case, the value of TextFieldDatapoint will modify the attribute "value" of the TextField control. To learn more about this see [Datapoints](#datapoints).
+`load_dataframe()` accepts pandas-style `to_dict(orient="records")` and
+Polars-style `to_dicts()` objects without importing either library.
+`to_dataframe()` requires pandas:
 
-Also, as we mentioned in the **App** section, in the view we can declare the controls that can be added to the flet page object. In this case we will need to add them into separate attributes. Following the example of the banner we mentioned before, the banner will look like this in the view:
-
-```python
-class MainView(FletView):
-    def __init__(self, controller, model):
-        self.banner = ft.Banner(  # <--
-            ref=model.Banner,
-            bgcolor=ft.colors.AMBER_100,
-            leading=ft.Icon(ft.icons.WARNING_AMBER_ROUNDED, color=ft.colors.AMBER, size=40),
-            actions=[
-                ...
-            ],
-        )
-
-        view = [
-            ... # List of "normal" flet controls
-        ]
-        super().__init__(model, view, controller)
+```bash
+python -m pip install "flet-mvc[dataframe]>=1.0,<2"
 ```
 
-and that is how now the banner could be set to the page by using the datapoint in the controller.py or by using this attribute in the app.py at the "Settings" section.
+`save_csv()` uses Flet's current asynchronous `FilePicker.save_file()` and
+sends CSV bytes for desktop or web download.
 
-Now let’s talk about the model before talking about the controller.
+The canonical adapter API is:
 
-**Model**
+| Purpose | API |
+|---|---|
+| Native table | `control` |
+| Define content | `set_columns()`, `set_rows()` |
+| Import | `load_records()`, `load_dataframe()` |
+| Export in memory | `to_records()`, `to_csv()`, `to_dataframe()` |
+| Save or download | `save_csv()` |
 
-The Model class inherit the *FletModel* base class. Here is where we create methods with the flet-mvc @data decorator, which I like to call: **Datapoints**.
+## Project templates
 
-In a VERY simple terms (maybe someone can get mad at me for saying this), the Model is a class that contains all the “variables” that the app will work with. These “variables” can have anything: from a Pandas DF obtained from SQL, Classes, Controls; to simple data types like strings, lists, int, etc. 
+The CLI provides four runnable starting points:
 
-In order to create a “variable”/datapoint in the model, you only need to create a method, return it’s default value (can be computed with any logic that you want to use) and use the @data decorator in it.
+| Command | What it demonstrates |
+|---|---|
+| `flet-mvc start -d my_app` | Small class-oriented MVC project |
+| `flet-mvc reactive -d my_app` | Computed state and `FletComponent` |
+| `flet-mvc routes -d my_app` | Official Flet Router and native views |
+| `flet-mvc tabs -d my_app` | Current `Tabs`, `TabBar`, and `TabBarView` |
 
-The benefits of having a datapoint is that it can be accessed from the Controller and **can be used as any other python datatype**, but **additionally**: it will allow you to **set** **it’s value** in case it’s needed and most importantly **reset** **it’s value**!
+Preview every file without writing:
 
-\*\* Since version *0.1.0: The datapoint update*,  Datapoint can also work as Flet Ref objects. For more information see: [Datapoints](#datapoints)
-
-
-**Controller**
-
-I like to think that the Controller is the most relevant class from an application because it handles all the interactions of the user within the app (events).
-
-Essentially the controller class will inherit from flet-mvc *FletController* base class and in it you will define all the methods that *Flet controls* use to handle the events. (as mentioned in the View explanation)
-
-Let's talk about all the possibilities that the FletController allows you to do:
-
-- **Access a model datapoint:**
-
-Let’s imagine in our Model we declare a “number” datapoint that return 5 by calculating 2+3:
-```python
-@data
-def number(self):
-    return 2 + 3
+```bash
+flet-mvc reactive --destination my_app --dry-run
 ```
 
-now in our Controller we have a “clicked” method (which we assume is called when a button is clicked), and we want to print the “number” value. We will achieve this by doing the following:
+Existing files are not overwritten by default. After reviewing the
+destination, `--force` replaces template files:
 
-```python
-class Controller(FletController):
-
-    def clicked(self, e=None):
-        print(self.model.number())  # will print: 5
+```bash
+flet-mvc reactive --destination my_app --force
 ```
 
-\*Notice how we call the datapoint by using the parethesis (), this returns the current value of the datapoint.
+Each template includes a short local README and its own `pyproject.toml`.
 
-- **Set a model datapoint with any other value:**
+## Public API at a glance
 
-Now let’s say we want to set our “number” datapoint value to 1 after we "click" it. Then we will use the **set\_value** property of the datapoint:
+| Area | Public names |
+|---|---|
+| Model | `FletModel`, `Datapoint`, `DatapointChange`, `data`, `computed` |
+| Declarative hook | `use_datapoint` |
+| Binding | `register_control_binding` and binding exceptions |
+| Components | `FletComponent`, `send`, `receive`, `NO_CHANGE` |
+| Tables | `DataTableAdapter` |
 
-```python
-class Controller(FletController):
-    
-    def clicked(self, e=None):
-        print(self.model.number())  # will print: 5
-        self.model.number.set_value(1)
-        print(self.model.number())  # will print: 1
-```
-This number is saved and can be latter used by another other controller method or even other Controller class as long as it has the model instance reference:
+The main errors are:
 
-```python
-    def clicked2(self, e=None):
-        print(self.model.number())  # will print: 1
+- `DatapointError`: base reactive-state error;
+- `DatapointBindingError`: binding or atomic synchronization failed;
+- `UnsupportedControlError`: no safe default field is registered;
+- `DatapointDependencyError`: dependency declaration is invalid;
+- `DependencyCycleError`: the graph contains a cycle.
 
-```
+Pre-1.0 compatibility aliases and duplicate Flet layers were removed before
+the stable API was published. The exact replacements are in
+[`MIGRATION.md`](https://github.com/o0Adrian/flet-mvc/blob/master/MIGRATION.md).
 
-- Reset a model datapoint 
+## Development
 
-If we no longer need the set value and want to revert our change to this datapoint, it’s as easy as use the **reset** property:
+Install the repository with development dependencies:
 
-```python
-class Controller(FletController):
-    
-    def clicked(self, e=None):
-        print(self.model.number())  # will print: 5
-        self.model.number.set_value(1)
-        print(self.model.number())  # will print: 1
-        self.model.number.reset()
-        print(self.model.number())  # will print: 5 again after calculating 2+3 again.
+```bash
+git clone https://github.com/o0Adrian/flet-mvc.git
+cd flet-mvc
+python -m pip install -e ".[dev]"
 ```
 
-- Set the default value of a datapoint
+Run the fast checks:
 
-If by any chance we want to set a new default value whenever we reset a datapoint, we will use **set_default** property:
-
-```python
-class Controller(FletController):
-    
-    def clicked(self, e=None):
-        print(self.model.number())  # will print: 5
-        self.model.number.set_value(1)
-        print(self.model.number())  # will print: 1
-        self.model.number.set_default(3)
-        self.model.number.reset()
-        print(self.model.number())  # will print: 3 which is the new default
+```bash
+python -m pytest
+python -m ruff check .
+python -m ruff format --check .
+python -m mypy
 ```
 
-To learn more about datapoints please see [Datapoints](#datapoints).
+The repository also contains real Flet browser, Pyodide, generated-template,
+and packaged integration checks. See
+[`CONTRIBUTING.md`](https://github.com/o0Adrian/flet-mvc/blob/master/CONTRIBUTING.md)
+for the complete workflow.
 
+## License
 
-<a name="extra"></a>
-
-### Controller Extra abilities
-
-- The FletController base class also allows out app Controller to update the view, as we would do it with page.update() but just by running self.update() in a controller method, like this:
-
-```python
-    def clicked(self, e=None):
-        self.update()
-```
-
-- You can also access flet “page” by doing self.page
-- Create alerts, you can send an alert whenever you need it as snackbar by using:
-
-self.alert(“{your alert message}”, {alert type})
-
-
-Example:
-```python
-self.alert("Alert Message", alert.WARNING)  # from flet_mvc import alert
-```
-
-alert shown:
-
-![](imgs/Aspose.Words.efcdc9e9-d587-4000-ba2a-a36665e1390e.005.png)
-
-There are 5 different alerts, feel free to experiment with any of them.
-```python
-WARNING = "warning"
-ERROR = "error"
-SUCCESS = "success"
-INFO = "info"
-ADVICE = "advice"
-```
-
-<a name="datapoints"></a>
-
-# Datapoints
-
-
-The data decorator in the Flet MVC framework is a powerful tool for defining Datapoints within a model. These datapoints form the backbone of your model's state and can be used to track, manipulate, and reference important data throughout the lifecycle of the Flet app.
-
-I recommend using PascalCase to define your datapoints. ()
-
-It's important to mention that there are three types of datapoints:
-
-- <u>Normal Datapoint</u>: This Datapoints are used as normal "variables" that can be used at any time of the App lifecycle, they can be any type of data that you need: Pandas Dataframes, objects, integers, strings, etc. The way to define this datapoints is simply by creating a method in the model with the @data decorator:
-
-    ```python
-    class Model(FletModel):
-        @data
-        def Example(self):
-            return "string type"
-    ```
-
-- <u>Normal Reference Data Points</u>: Normal reference data points are used when you want a Datapoint to affect the state of a Flet Control whenever these datapoints change their value. Also the returned type of this datapoint will be set to a specific attribute of the control, depending which one is it. Please see the section "Supported Flet Controls" below to learn more about the attributes affected. The way to define these datapoints is by declaring a normal datapoint, but adding it to a flet control `ref` attribute:
-
-    ```python
-    class Model(FletModel):
-        @data
-        def Example(self):
-            return "string type value"
-
-    class MainView(FletView):
-        def __init__(self, controller, model):
-            view = [
-                ft.Text(ref=model.Example)  # This converts the datapoint automatically to a Ref Obj
-            ]
-            super().__init__(model, view, controller)
-    ```
-
-- <u>Reference-Only Datapoints (RefOnly)</u>: Lastly, RefOnly Datapoints are meant to be used only for referencing. They cannot be directly set, reset, appended to, or retrieved like normal data points; also they should return a None value since it's returned value don't affect the state of the Flet Control. Any attempts to directly interact with a RefOnly data point will raise a TypeError.
-
-    Essentially they will fully work as normal Flet Ref Obj and in order to access the attributes of a control you will need to invoke the `.current` property. Don't forget to add it to the `ref` attribute of a Flet Control. The way to define them is by using the `@data.RefOnly` decorator:
-
-     ```python
-    class Model(FletModel):
-        @data.RefOnly  # <--
-        def Example(self):
-            return None  # Any other value will result in useless logic
-
-    class MainView(FletView):
-        def __init__(self, controller, model):
-            view = [
-                ft.Text(ref=model.Example, value="RefOnly") # Assigning
-            ]
-            super().__init__(model, view, controller)
-    ```
-
-
-As seen in the Controller section, here are some of the functionalities of the data decorator:
-
-## 1. Setting and Getting Data Point Values
-
-Once a data point is defined, its value can be set using the `set_value()` function, and retrieved simply by calling the data point as a function. For example:
-
-```python
-model = MockModel()
-model.datapoint.set_value("Test Value")
-print(model.datapoint())  # Prints: Test Value
-```
-If the Datapoint is a ref obj datapoint, it will only accept the expected type of the control. For example, seting a string value for a datapoint that needs an integer for it's defined attributes (see *Supported flet controls* section below), will raise an exception. Same error will be applied if the default returned value is not consintent with the control.
-## 2. Resetting Data Point Values
-
-The value of a data point can be reset to its initial value using the `reset()` function. For example:
-
-```python
-model.datapoint.reset()
-print(model.datapoint())  # Resets to it's initial defined value (unless it's set to a new default)
-```
-
-## 3. Setting a new default value
-
-In the case that you need to set a new default for a datapoint, you can always use the `set_default` function. For Example:
-
-```python
-print(model.datapoint()) # Initial declared value
-model.datapoint.set_default("new value")
-model.datapoint.reset()
-print(model.datapoint())  # Shows "new value"
-```
-
-
-## 4. Appending to List Data Points
-
-If a data point is a list, values can be appended to it using the `append()` function. Note that a normal append operation won't modify the `has_set_value` attribute of the data point.
-
-```python
-model.datapoint_list().append("Test Value")
-print(model.datapoint_list())  # Prints: ["Test Value"]
-```
-In case the Datapoint is a ref value with a data type of list (usually list of controls), then the append method can be directly called from the datapoint, it won't work otherwise.
-
-```python
-model.datapoint_list.append(ft.Text()"Test Value"))
-print(model.datapoint_list())  # Shows the full list of controls that the datapoint has.
-```
-
-## 5. Check if it has a value set
-
-Sometime you may want to see if a datapoint has changed of state and a value has been set. In order to solve that you can use the `has_set_value()` function, which will return a bool when the state has been set.
-
-```python
-print(model.datapoint.has_set_value()) # False
-model.datapoint.set_value(None)
-print(model.datapoint.has_set_value()) # True
-model.datapoint.reset()
-print(model.datapoint.has_set_value()) # False
-```
-
-## 6. Hard Reset (WARNING)
-
-There is also a hard reset method called `__hard_reset__()` which will completely reset the datapoint to a state where it was never assigned to any flet Control, loosing all reference and being in the limbo. I have been using this to test the same datapoint in multiple flet controls by losing reference of the previous ones.
-
-## 7. Multireference
-
-A Datapoint can save the reference of multiple controls at the same time, in other words, we are assinging the same datapoint to multiple controls (that's why in order to assign a datapoint to another control you first need to call the __hard__reset__() method as mentioned above). This should be only used when you are sure the controls have the same attribute to be set by the ref datapoint. This can be useful when you have multiple copies of the same control. Not sure if it's needed but added this possibility.
-
-## 8. Current property
-
-The `.current` property can only be used by Ref Datapoints, either normal ones or RefOnly datapoints. The value returned by this property it's the referenced flet Control itself. This way you can access all the attributes of a control in the controller.
-
-## 9. Control Dependencies
-
-This is where the magic can happen. Let's say you have a dialog component:
-
-
-```python
-ft.AlertDialog(ref=model.Dialog, title=ft.Text("Title"))
-```
-
-If you look at the section below you will see that the Ref Datapoint will affect the content of the Dialog, but not the title, but what if we also what to have the text of the title in another datapoint so that it can change of state depending on a controller event? Well, we could define another ref datapoint to this text!
-
-```python
-ft.AlertDialog(ref=model.Dialog, title=ft.Text(ref=model.Text))
-```
-
-Hence our model datapoint will look like this:
-
-```python
-@data
-def Text(self):
-    return "Title"
-
-@data
-def Dialog(self):
-    return ft.Text("This is my dialog content")
-```
-
-but as you can see there is even more levels to the Dialog datapoint, so we can even add more ref objects from the "self" model.
-
-```python
-@data
-def Text(self):
-    return "Title"
-
-@data
-def Dialog(self):
-    return ft.Text(ref=self.DialogContentText)
-
-@data
-def DialogContentText(self):
-    return "This is my dialog content"
-```
-you see where I am going? I know this example is a little useless, but it can illustrate the power of ref datapoint, and even more because if we do a `self.model.Text.set_value("new_title")` in the controller, it will automatically affect the root Control which will be the AlertDialog.
-
-Just for the record, another way to do this will be the following:
-
-```python
-dialog = ft.AlertDialog(content=ft.Text(ref=model.DialogContentText) title=ft.Text(ref=model.Text)) 
-
-# assigned to variable so I can set it in the page dialog attribute. *See the banner example at the View Section above.
-```
-this way I am only using two datapoint instead of three, but sometimes have that third one is useful.
-
-<br>
-
-## Supported flet controls:
-
-| Control                 | Attribute    | Type       |
-|-------------------------|--------------|------------|
-| ft.TextField            | value        | str        |
-| ft.AlertDialog          | content      | Control    |
-| ft.AnimatedSwitcher     | content      | Control    |
-| ft.AppBar               | actions      | list       |
-| ft.Audio                | src          | str        |
-| ft.Banner               | content      | Control    |
-| ft.BottomSheet          | content      | Control    |
-| ft.Card                 | content      | Control    |
-| ft.Checkbox             | value        | Bool       |
-| ft.CircleAvatar         | content      | Control    |
-| ft.Column               | controls     | list       |
-| ft.Container            | content      | Control(s?)|
-| ft.DataTable            | rows         | list       |
-| ft.DataRow              | cells        | list       |
-| ft.Draggable            | content      | Control    |
-| ft.DragTarget           | content      | Control    |
-| ft.Dropdown             | options      | list       |
-| ft.ElevatedButton       | text         | str        |
-| ft.FilledButton         | text         | str        |
-| ft.FilledTonalButton    | text         | str        |
-| ft.FloatingActionButton | text         | str        |
-| ft.GestureDetector      | content      | Control    |
-| ft.GridView             | controls     | list       |
-| ft.Icon                 | name         | str        |
-| ft.Image                | src          | str        |
-| ft.ListTile             | title        | Control    |
-| ft.ListView             | controls     | list       |
-| ft.Markdown             | value        | str        |
-| ft.NavigationBar        | destinations | list       |
-| ft.NavigationRail       | destinations | list       |
-| ft.OutlinedButton       | text         | str        |
-| ft.PopupMenuItem        | text         | str        |
-| ft.PopupMenuButton      | items        | list       |
-| ft.ProgressBar          | value        | float      |
-| ft.ProgressRing         | value        | float      |
-| ft.Radio                | value        | str        |
-| ft.RadioGroup           | value        | str        |
-| ft.ResponsiveRow        | controls     | list       |
-| ft.Row                  | controls     | list       |
-| ft.ShaderMask           | content      | Control    |
-| ft.Slider               | value        | int        |
-| ft.Stack                | controls     | list       |
-| ft.Switch               | value        | bool       |
-| ft.Tabs                 | tabs         | list       |
-| ft.Text                 | value        | str        |
-| ft.TextButton           | text         | str        |
-| ft.TextField            | value        | str        |
-| ft.TextSpan             | text         | str        |
-| ft.Tooltip              | content      | Control    |
-| ft.TransparentPointer   | content      | ----       |
-| ft.WindowDragArea       | content      | Control    |
-| ft.canvas.Canvas        | shapes       | list       |
-
-
-Other supported controls are, but I would recommend using them as RefOnly datapoints:
-
-| Control                |
-|------------------------|
-| ft.DataColumn          |
-| ft.Divider             |
-| ft.DataCell            |
-| ft.FilePicker          |
-| ft.HapticFeedback      |
-| ft.IconButton          |
-| ft.InlineSpan          |
-| ft.Semantics           |
-| ft.ShakeDetector       |
-| ft.SnackBar            |
-| ft.VerticalDivider     |
-
-
-MatplotlibChart, PlotlyChart, LineChart, BarChart, PieChart Controls are still missing some testing.
-
-<a name="common-mistakes"></a>
-
-# Common Mistakes
-If you have any issues in your code is possible that these are the possible mistakes:
-
-1. <u>Forget to add the Ref-Datapoint to a Flet Control</u>: Keep in consideration that if you want to use a model datapoint as Ref-Object or RefOnly-Object **you need to assign it to a Flet control!** Else you won't be seeing any change being made in the UI.
-
-    Example:
-
-    ```python
-    ft.Text(ref=model.MyRefDatapoint)
-    ```
-
-2. <u>Forget to use current attribute of a Ref-Object Datapoint in the Controller:</u> When working with Ref-Object Datatpoints, it's possible to forget using the *current* property. This one will actually return the Flet Control that you are referencing. So it's important to call current when accessing any other arrtribute of a Control.
-
-    Example:
-    ```python
-    # Inside a controller function:
-    self.model.MyRefDatatpoint.current.icon
-    ```
-
-3. <u>Calling the model datapoints and controller functions in the Flet controls:</u> In order to attach a datapoint to a Flet control, or adding the function to be triggered by an event of a flet control, it's important to specify only the object! not calling it!
-
-    Example:
-    ```python
-    # Wrong:
-    ft.ElevatedButton(ft.model.ButtonDatapoint(), on_click=controller.button_click())
-    # Correct (no parenthesis):
-    ft.ElevatedButton(ft.model.ButtonDatapoint, on_click=controller.button_click)
-    ```
+MIT. See [LICENSE](https://github.com/o0Adrian/flet-mvc/blob/master/LICENSE).

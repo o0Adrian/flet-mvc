@@ -1,0 +1,10 @@
+include CHANGELOG.md
+include CONTRIBUTING.md
+include LICENSE
+include MIGRATION.md
+include README.md
+include README.es.md
+include flet_mvc/py.typed
+recursive-include docs *.md
+recursive-include mvc_commands/templates *.md *.py *.toml
+recursive-include mvc_commands/templates .gitignore

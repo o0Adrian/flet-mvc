@@ -1,0 +1,29 @@
+[project]
+name = "flet-mvc-routes-app"
+version = "0.1.0"
+description = "A routed Flet MVC application."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flet>=0.86.3,<0.87",
+    "flet-mvc>=1.0,<2",
+]
+
+[dependency-groups]
+dev = [
+    "flet-cli>=0.86.3,<0.87",
+    "flet-desktop>=0.86.3,<0.87",
+    "flet-web>=0.86.3,<0.87",
+    "flet[test]>=0.86.3,<0.87",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.flet]
+product = "Flet MVC Routes"
+org = "com.example"
+
+[tool.flet.app]
+path = "src"

@@ -1,0 +1,121 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flet-mvc"
+version = "1.0.0"
+description = "Reactive domain state, bindings, and optional MVC scaffolding for Flet."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "C. Adrián Monroy", email = "carlos.monclef@gmail.com" },
+]
+keywords = [
+    "computed-state",
+    "controller",
+    "datapoint",
+    "dependency-graph",
+    "flet",
+    "model",
+    "mvc",
+    "reactive-state",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = [
+    "click>=8.1,<9",
+    "flet>=0.86.3,<0.87",
+]
+
+[project.optional-dependencies]
+dataframe = [
+    "pandas>=2.2",
+]
+dev = [
+    "build>=1.2",
+    "flet[all,test]>=0.86.3,<0.87",
+    "mypy>=1.15,<2",
+    "pytest>=8,<10",
+    "pytest-asyncio>=1,<2",
+    "pytest-cov>=5,<8",
+    "ruff>=0.9,<1",
+    "tomli>=2; python_version < '3.11'",
+    "twine>=6,<7",
+]
+
+[project.scripts]
+flet-mvc = "mvc_commands.cli:cli"
+
+[project.urls]
+Documentation = "https://github.com/o0Adrian/flet-mvc#readme"
+Issues = "https://github.com/o0Adrian/flet-mvc/issues"
+Repository = "https://github.com/o0Adrian/flet-mvc"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["flet_mvc*", "mvc_commands*"]
+
+[tool.setuptools.package-data]
+flet_mvc = ["py.typed"]
+mvc_commands = [
+    "templates/*/.gitignore",
+    "templates/*/*.md",
+    "templates/*/*.toml",
+    "templates/*/src/*.py",
+    "templates/*/src/*/*.py",
+    "templates/*/tests/*.py",
+]
+
+[tool.pytest.ini_options]
+addopts = ["-ra", "--strict-config", "--strict-markers"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["flet_mvc", "mvc_commands"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["flet_mvc", "mvc_commands", "type_tests"]
+exclude = "^mvc_commands/templates/"
+check_untyped_defs = true
+follow_imports = "normal"
+follow_imports_for_stubs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["numpy", "numpy.*", "pandas", "pandas.*"]
+follow_imports = "skip"
+ignore_missing_imports = true

@@ -1,0 +1,36 @@
+[project]
+name = "flet-mvc-integration"
+version = "1.0.0"
+description = "Real Flet integration tests for flet-mvc."
+requires-python = ">=3.10"
+dependencies = [
+    "flet==0.86.3",
+    "flet-mvc",
+]
+
+[tool.uv.sources]
+flet-mvc = { path = "..", editable = true }
+
+[dependency-groups]
+dev = [
+    "flet-cli==0.86.3",
+    "flet-desktop==0.86.3",
+    "flet-web==0.86.3",
+    "flet[test]==0.86.3",
+    "playwright>=1.55,<2",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.flet]
+org = "dev.fletmvc"
+product = "flet-mvc-integration"
+company = "flet-mvc"
+copyright = "Copyright (C) 2026 flet-mvc"
+dev_packages = { "flet-mvc" = ".." }
+
+[tool.flet.app]
+path = "src"
